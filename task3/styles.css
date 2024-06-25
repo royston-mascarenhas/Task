@@ -281,6 +281,7 @@ input[type="checkbox"]{
 }
 
 .course-card-top{
+    flex-grow: 1;
     padding-bottom:15px;
     display: flex;
     width: 100%;
@@ -289,15 +290,24 @@ input[type="checkbox"]{
 }
 
 .course-img{
-    margin-right: 30px;
+    margin-right: 50px;
+    
+}
+
+.course-img img{
+    height: 200px;
+    width: 150px;
 }
 
 .course-info{
+    
     width: 100%;
     
 }
 
 .course-card{
+    display: flex;
+    flex-direction: column;
     max-width: 750px;
     background-color: white;
     padding:30px;
