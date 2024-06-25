@@ -1,17 +1,49 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 
+@font-face {
+    font-family: myfontTitle;
+    src: url(../quantum_screen_assets/Quicksand_font_1/static/Quicksand-Bold.ttf);
+    font-weight: 900;
+}
+
+@font-face {
+    font-family: myfontTitle;
+    src: url(../quantum_screen_assets/Quicksand_font_1/static/Quicksand-SemiBold.ttf);
+    font-weight: 700;
+}
+@font-face {
+    font-family: myfontTitle;
+    src: url(../quantum_screen_assets/Quicksand_font_1/static/Quicksand-Medium.ttf);
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: myfontTitle;
+    src: url(../quantum_screen_assets/Quicksand_font_1/static/Quicksand-Regular.ttf);
+    font-weight: 300;
+}
+@font-face {
+    font-family: myfontTitle;
+    src: url(../quantum_screen_assets/Quicksand_font_1/static/Quicksand-Light.ttf);
+    font-weight: 100;
+}
+
+
 
 
 body{
     display: flex;
     flex-direction: column;
     height:100vh;
-    font-family: "Roboto", sans-serif;
+    
     
     margin: 0;
     padding: 0;
     background-color: #EEEEEE;
+
+    font-family: myfontTitle !important;
+    font-weight: 400 !important;
 }
 nav{
     height: 90px;
@@ -96,6 +128,7 @@ img{
 
 .foot div:nth-child(1){
     margin-right: 20px;
+    
 
 }
 
@@ -137,11 +170,19 @@ img{
     display:flex ;
     align-items: center;
     margin-bottom: 20px;
+    font-family: myfontTitle !important;
+    font-weight: 700 !important;
+    font-size: 1.5em;
     
-   
 }
 
 
+.user-info .state,.district{
+    font-size: small;
+    margin-bottom: 40px;
+    font-family: myfontTitle;
+    font-weight: 500;
+}
 .span-title{
     text-align: center;
     flex-grow: 1;
@@ -278,6 +319,8 @@ input[type="checkbox"]{
     margin: 30px;
     display:flex;
     justify-content: space-between;
+    -webkit-box-flex: initial;
+    box-flex: initial;
 }
 
 .course-card-top{
@@ -326,6 +369,7 @@ input[type="checkbox"]{
 
 .course-content{
     display: grid;
+    box-sizing: border-box;
     padding: 30px;
     gap:20px ;
     grid-template-columns: auto auto;
