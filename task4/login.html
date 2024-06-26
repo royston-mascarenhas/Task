@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./styles/styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+</head>
+<body>
+
+    <nav>
+        <img src="../quantum_screen_assets/icons/logo used in header.svg" alt="" />
+      
+    </nav>
+
+    <div class="content">
+        <div class="login-container">
+            <div class="login-title">
+                <i class="fa-solid fa-arrow-left fa-lg"></i>
+                <span class="span-title">Log in with Quantam</span>
+              </div>
+
+              <div class="login-radio">
+                <div class="radio-district">
+                  <input type="radio" id="district" name="radio" value="District" />
+                  <label for="district">District</label>
+                </div>
+                <div class="radio-Independentschool">
+                  <input type="radio" id="Independentschool" name="radio" value="Independent School"/>
+                  <label for="Independentschool">Independent School</label>
+                </div>
+              </div>
+
+              <div class="user-info">
+
+                <div class="state">
+                  <label for="state">State*</label>
+                  <br />
+                  <select name="state" id="state">
+                    <option value="Alabama">Alabama</option>
+                  </select>
+                </div>
+      
+                <div class="district">
+                  <label for="district">District*</label>
+                  <br />
+                  <select name="district" id="district">
+                    <option value="Alabama School">Alabama School</option>
+                  </select>
+                </div>
+      
+                <div class="username">
+                  <input type="text" placeholder="Username/Email*" />
+                  <div >
+                    <a href="#" style="color: green; text-decoration: none">
+                      Forgot Username
+                    </a>
+                  </div>
+                </div>
+      
+                <div class="password">
+                  <div class="pass">
+                    <input type="password"style="flex-grow: 1"placeholder="Password*"/>
+                    <i class="fa fa-eye" style="color: green;"></i>
+                  </div>
+      
+                  <div class="eye">
+                    <a href="#" style="color: green; text-decoration: none">Forgot Password</a>
+                  </div>
+                </div>
+      
+                <div class="remember-me">
+                  <input type="checkbox" name="checkbox" value="checkbox" />
+                  <label for="checkbox">Remember Me</label>
+                </div>
+      
+                <div class="login">
+                  <button>
+                    LOG IN
+                  </button>
+                </div>
+              </div>
+
+        </div>
+    </div>
+    
+</body>
+</html>

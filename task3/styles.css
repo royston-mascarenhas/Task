@@ -59,6 +59,7 @@ nav{
 
 nav img{
     padding: 8px;
+    height: 50px;
 }
 
 img{
@@ -96,6 +97,21 @@ img{
  
  }
 
+
+ .username div{
+    text-align: right; font-size: large;
+ }
+
+ .password div:nth-child(1){
+    display: flex;border: 0;align-items: center;border-bottom: 1px solid rgb(171, 167, 167);
+ }
+
+ .password div:nth-child(2){
+    text-align: right; font-size: large;
+ }
+ 
+ 
+
  .active{
 
     border-bottom:8px solid white;
@@ -104,6 +120,41 @@ img{
     
 
  }
+
+ nav i{
+    margin-right: 20px;
+    color: rgb(9, 255, 9) ;
+    position: relative;
+    padding: 10px;
+ }
+
+ nav i:last-child{
+    margin-right: 20px;
+    color: rgb(9, 255, 9);
+ }
+
+ .profile-img{
+    position: relative;
+ }
+
+ .profile-img img{
+    height: 30px;
+    width: 30px; 
+    border-radius: 50%;
+    margin-right: 20px;
+ }
+
+ .profile-img span{
+    position: absolute;
+    top: 0;
+    right:20px;
+    border-radius: 50%;
+    background-color:#4c4ce2 ; 
+    padding:2px 6px;
+    font-size: small;
+    color: white;
+ }
+
 .content{
     background-color: #EEEEEE;
     display: flex;
@@ -113,6 +164,11 @@ img{
     justify-content: center;
     align-content: stretch ;
 }
+
+.home-body{
+    flex-grow: 1;
+}
+
 
 .foot{
     background-color: #EEEEEE; 
@@ -162,6 +218,12 @@ img{
 .logo2{
     height: 50px;
     
+}
+
+
+.base img{
+    height:40px;
+    margin-right: 20px;
 }
 
 .about{
@@ -299,6 +361,16 @@ input[type=password]{
 
 .login{
     text-align: center;
+}
+
+.login button{
+    padding: 10px 80px;
+    border: 0;
+    border-radius: 4px;
+    font-size: large;
+    background-color: #3fd28b;
+    color: black;
+    font-size: 16px;
     
 }
 
@@ -322,7 +394,34 @@ input[type="checkbox"]{
 
 .course-active{
     border-bottom: 5px solid black;
+    flex-grow: 1;
+    text-align: center; 
+    padding: 20px;
 }
+
+.course-active i{
+    margin-right: 10px;
+}
+
+.course-active h2{
+    display: inline
+}
+
+
+.course-unactive{
+    flex-grow: 1; 
+    text-align: center; 
+    padding: 20px;
+}
+
+.course-unactive i{
+    margin-right: 10px;
+}
+
+.course-unactive h2{
+    display: inline
+}
+
 
 .result{
     margin: 30px;
@@ -330,6 +429,8 @@ input[type="checkbox"]{
     justify-content: space-between;
     -webkit-box-flex: initial;
     box-flex: initial;
+    border-bottom: 1px solid #a8a3a3; 
+    padding: 10px;
 }
 
 .course-card-top{

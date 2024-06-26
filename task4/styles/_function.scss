@@ -1,0 +1,11 @@
+@mixin flex($direction, $color, $align){
+
+    display:flex;
+    flex-direction:$direction ;
+    background-color:$color ;
+    align-items: $align;
+
+}
+
+
+

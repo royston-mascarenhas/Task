@@ -1,0 +1,17 @@
+@import "./function";
+@import "./content";
+@import "./nav";
+
+
+body{
+
+    @include flex(column,#EEEEEE,none);
+    margin: 0;
+    padding: 0;
+    height:100vh;
+    font-family: myfontTitle !important;
+    font-weight: 400 !important;
+}
+
+
+

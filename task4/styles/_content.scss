@@ -1,0 +1,127 @@
+.content{
+    @include flex(column,#EEEEEE,none);
+    flex-grow: 1;
+    padding: 8px;
+    justify-content: center;
+    align-content: stretch ;
+
+    .login-container{
+        max-width: 500px;
+        width: 100%;
+        background-color: white;
+        margin: 50px auto;
+        padding: 30px;
+        border-top: 5px solid aqua;
+        margin-bottom: 30px;
+        box-sizing: border-box;
+
+        .login-title{
+            @include flex(row,initial,center);
+            margin-bottom: 20px;
+            font-family: myfontTitle !important;
+            font-weight: 700 !important;
+            font-size: 1.5em;
+
+            span{
+                text-align: center;
+                flex-grow: 1;
+            }
+        }
+
+        .login-radio{
+            @include flex(row,initial,center);
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            .radio-district,.radio-Independentschool{
+                margin-right: 30px;
+                display:inline-flex;
+                align-items: center;
+                font-size: medium;
+                padding: 4px;
+                
+            }
+            .radio-Independentschool label{
+                flex-shrink: 0;
+            }
+        }
+
+        .user-info{
+            .state{
+                margin-bottom: 30px;
+            }
+            .district{
+                margin-bottom: 50px;
+            }
+            .username{
+                margin-bottom: 40px;
+                border:0;
+                div{
+                    text-align: right; font-size: large;
+                 }
+            }
+            .password{
+                margin-bottom: 30px;
+                border:0;
+                .pass{
+                    display: flex;
+                    border: 0;
+                    align-items: center;
+                    border-bottom: 1px solid rgb(171, 167, 167);
+                }
+                .eye{
+                    text-align: right; 
+                    font-size: large;
+                }
+            }
+            .remember-me{
+                display: flex;
+                align-items: center;
+                margin-bottom: 30px;
+            }
+            .login{
+                text-align: center;
+            }
+            .login button{
+                padding: 10px 80px;
+                border: 0;
+                border-radius: 4px;
+                font-size: large;
+                background-color: #3fd28b;
+                color: black;
+                font-size: 16px;
+            }
+            select{ 
+                width: 100% !important;
+                border:0;
+                border-bottom:1px solid rgb(171, 167, 167);
+                font-size: large;
+            }
+
+            input[type="radio"]{
+                height: 19px;
+                width: 19px;
+                accent-color: green;
+                margin-right: 10px;
+            }
+            input:not([type=checkbox],[type=password]){
+                width: 100%;
+                padding: 4px;
+                border:0;
+                font-size: large;
+                border-bottom:1px solid rgb(171, 167, 167);
+            }
+
+            input[type=password]{
+                padding: 4px;
+                /* outline: none; */
+                border:0 !important;
+                font-size: large;
+                border-bottom:1px solid rgb(171, 167, 167);
+            }
+
+            input[type="checkbox"]{
+                accent-color: green;    
+            }   
+        }  
+    }    
+}

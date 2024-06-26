@@ -1,0 +1,13 @@
+@import "./function";
+
+nav{
+    @include flex(row,#1c2530,center);
+    padding:0px 14px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    img{
+        padding: 8px;
+        height: 50px;
+    }
+}

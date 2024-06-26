@@ -1,0 +1,153 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  background-color: #EEEEEE;
+  align-items: none;
+  flex-grow: 1;
+  padding: 8px;
+  justify-content: center;
+  align-content: stretch;
+}
+.content .login-container {
+  max-width: 500px;
+  width: 100%;
+  background-color: white;
+  margin: 50px auto;
+  padding: 30px;
+  border-top: 5px solid aqua;
+  margin-bottom: 30px;
+  box-sizing: border-box;
+}
+.content .login-container .login-title {
+  display: flex;
+  flex-direction: row;
+  background-color: initial;
+  align-items: center;
+  margin-bottom: 20px;
+  font-family: myfontTitle !important;
+  font-weight: 700 !important;
+  font-size: 1.5em;
+}
+.content .login-container .login-title span {
+  text-align: center;
+  flex-grow: 1;
+}
+.content .login-container .login-radio {
+  display: flex;
+  flex-direction: row;
+  background-color: initial;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+.content .login-container .login-radio .radio-district, .content .login-container .login-radio .radio-Independentschool {
+  margin-right: 30px;
+  display: inline-flex;
+  align-items: center;
+  font-size: medium;
+  padding: 4px;
+}
+.content .login-container .login-radio .radio-Independentschool label {
+  flex-shrink: 0;
+}
+.content .login-container .user-info .state {
+  margin-bottom: 30px;
+}
+.content .login-container .user-info .district {
+  margin-bottom: 50px;
+}
+.content .login-container .user-info .username {
+  margin-bottom: 40px;
+  border: 0;
+}
+.content .login-container .user-info .username div {
+  text-align: right;
+  font-size: large;
+}
+.content .login-container .user-info .password {
+  margin-bottom: 30px;
+  border: 0;
+}
+.content .login-container .user-info .password .pass {
+  display: flex;
+  border: 0;
+  align-items: center;
+  border-bottom: 1px solid rgb(171, 167, 167);
+}
+.content .login-container .user-info .password .eye {
+  text-align: right;
+  font-size: large;
+}
+.content .login-container .user-info .remember-me {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+.content .login-container .user-info .login {
+  text-align: center;
+}
+.content .login-container .user-info .login button {
+  padding: 10px 80px;
+  border: 0;
+  border-radius: 4px;
+  font-size: large;
+  background-color: #3fd28b;
+  color: black;
+  font-size: 16px;
+}
+.content .login-container .user-info select {
+  width: 100% !important;
+  border: 0;
+  border-bottom: 1px solid rgb(171, 167, 167);
+  font-size: large;
+}
+.content .login-container .user-info input[type=radio] {
+  height: 19px;
+  width: 19px;
+  accent-color: green;
+  margin-right: 10px;
+}
+.content .login-container .user-info input:not([type=checkbox], [type=password]) {
+  width: 100%;
+  padding: 4px;
+  border: 0;
+  font-size: large;
+  border-bottom: 1px solid rgb(171, 167, 167);
+}
+.content .login-container .user-info input[type=password] {
+  padding: 4px;
+  /* outline: none; */
+  border: 0 !important;
+  font-size: large;
+  border-bottom: 1px solid rgb(171, 167, 167);
+}
+.content .login-container .user-info input[type=checkbox] {
+  accent-color: green;
+}
+
+nav {
+  display: flex;
+  flex-direction: row;
+  background-color: #1c2530;
+  align-items: center;
+  padding: 0px 14px;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+nav img {
+  padding: 8px;
+  height: 50px;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background-color: #EEEEEE;
+  align-items: none;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  font-family: myfontTitle !important;
+  font-weight: 400 !important;
+}/*# sourceMappingURL=styles.css.map */
