@@ -361,6 +361,7 @@ input[type="checkbox"]{
     width: 100%;
     position: relative;
     padding: 24px 16px 9px 24px;
+    box-sizing: border-box;
     
 }
 
@@ -371,6 +372,7 @@ input[type="checkbox"]{
     display: flex;
     padding: 0px 24px 0px 24px;
     justify-content: space-between;
+    height: 40px;
 }
 
 .course-content{
