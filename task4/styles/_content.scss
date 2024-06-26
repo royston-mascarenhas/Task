@@ -21,13 +21,11 @@
             font-family: myfontTitle !important;
             font-weight: 700 !important;
             font-size: 1.5em;
-
             span{
                 text-align: center;
                 flex-grow: 1;
             }
         }
-
         .login-radio{
             @include flex(row,initial,center);
             margin-bottom: 30px;
@@ -44,7 +42,6 @@
                 flex-shrink: 0;
             }
         }
-
         .user-info{
             .state{
                 margin-bottom: 30px;
@@ -96,7 +93,6 @@
                 border-bottom:1px solid rgb(171, 167, 167);
                 font-size: large;
             }
-
             input[type="radio"]{
                 height: 19px;
                 width: 19px;
@@ -110,7 +106,6 @@
                 font-size: large;
                 border-bottom:1px solid rgb(171, 167, 167);
             }
-
             input[type=password]{
                 padding: 4px;
                 /* outline: none; */
@@ -118,7 +113,6 @@
                 font-size: large;
                 border-bottom:1px solid rgb(171, 167, 167);
             }
-
             input[type="checkbox"]{
                 accent-color: green;    
             }   
