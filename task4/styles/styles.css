@@ -1,3 +1,28 @@
+@font-face {
+  font-family: myfontTitle;
+  src: url(../../quantum_screen_assets/Quicksand_font_1/static/Quicksand-Bold.ttf);
+  font-weight: 900;
+}
+@font-face {
+  font-family: myfontTitle;
+  src: url(../../quantum_screen_assets/Quicksand_font_1/static/Quicksand-SemiBold.ttf);
+  font-weight: 700;
+}
+@font-face {
+  font-family: myfontTitle;
+  src: url(../../quantum_screen_assets/Quicksand_font_1/static/Quicksand-Medium.ttf);
+  font-weight: 500;
+}
+@font-face {
+  font-family: myfontTitle;
+  src: url(../../quantum_screen_assets/Quicksand_font_1/static/Quicksand-Regular.ttf);
+  font-weight: 300;
+}
+@font-face {
+  font-family: myfontTitle;
+  src: url(../../quantum_screen_assets/Quicksand_font_1/static/Quicksand-Light.ttf);
+  font-weight: 100;
+}
 .content {
   display: flex;
   flex-direction: column;
@@ -24,11 +49,11 @@
   background-color: initial;
   align-items: center;
   margin-bottom: 20px;
-  font-family: myfontTitle !important;
-  font-weight: 700 !important;
   font-size: 1.5em;
 }
 .content .login-container .login-title span {
+  font-family: myfontTitle;
+  font-weight: 900;
   text-align: center;
   flex-grow: 1;
 }
@@ -40,7 +65,15 @@
   margin-bottom: 30px;
   flex-wrap: wrap;
 }
+.content .login-container .login-radio input[type=radio] {
+  height: 19px;
+  width: 19px;
+  accent-color: green;
+  margin-right: 10px;
+}
 .content .login-container .login-radio .radio-district, .content .login-container .login-radio .radio-Independentschool {
+  font-family: myfontTitle;
+  font-weight: 700;
   margin-right: 30px;
   display: inline-flex;
   align-items: center;
@@ -53,20 +86,62 @@
 .content .login-container .user-info .state {
   margin-bottom: 30px;
 }
+.content .login-container .user-info .state label {
+  font-size: small;
+  font-family: myfontTitle;
+  font-weight: 500;
+}
+.content .login-container .user-info .state select {
+  font-family: myfontTitle;
+  font-weight: 700;
+}
 .content .login-container .user-info .district {
   margin-bottom: 50px;
+}
+.content .login-container .user-info .district label {
+  font-size: small;
+  font-family: myfontTitle;
+  font-weight: 500;
+}
+.content .login-container .user-info .district select {
+  font-family: myfontTitle;
+  font-weight: 700;
 }
 .content .login-container .user-info .username {
   margin-bottom: 40px;
   border: 0;
 }
+.content .login-container .user-info .username input::-moz-placeholder {
+  font-family: myfontTitle;
+  font-weight: 700;
+}
+.content .login-container .user-info .username input::placeholder {
+  font-family: myfontTitle;
+  font-weight: 700;
+}
 .content .login-container .user-info .username div {
+  font-family: myfontTitle;
+  font-weight: 700;
   text-align: right;
-  font-size: large;
+  font-size: medium;
+  color: #3fd28b;
+  text-decoration: none;
+}
+.content .login-container .user-info .username div a {
+  color: rgb(0, 95, 0);
+  text-decoration: none;
 }
 .content .login-container .user-info .password {
   margin-bottom: 30px;
   border: 0;
+}
+.content .login-container .user-info .password input::-moz-placeholder {
+  font-family: myfontTitle;
+  font-weight: 700;
+}
+.content .login-container .user-info .password input::placeholder {
+  font-family: myfontTitle;
+  font-weight: 700;
 }
 .content .login-container .user-info .password .pass {
   display: flex;
@@ -76,12 +151,26 @@
 }
 .content .login-container .user-info .password .eye {
   text-align: right;
-  font-size: large;
+  font-size: medium;
+}
+.content .login-container .user-info .password .eye a {
+  font-family: myfontTitle;
+  font-weight: 700;
+  color: rgb(0, 95, 0);
+  text-decoration: none;
 }
 .content .login-container .user-info .remember-me {
+  font-family: myfontTitle;
+  font-weight: 700;
   display: flex;
   align-items: center;
   margin-bottom: 30px;
+}
+.content .login-container .user-info .remember-me input[type=checkbox] {
+  height: 19px;
+  width: 19px;
+  margin: 0px;
+  margin-right: 5px;
 }
 .content .login-container .user-info .login {
   text-align: center;
@@ -90,10 +179,11 @@
   padding: 10px 80px;
   border: 0;
   border-radius: 4px;
-  font-size: large;
+  font-size: medium;
   background-color: #3fd28b;
   color: black;
-  font-size: 16px;
+  font-family: myfontTitle;
+  font-weight: 700;
 }
 .content .login-container .user-info select {
   width: 100% !important;
@@ -140,6 +230,35 @@ nav img {
   height: 50px;
 }
 
+.foot {
+  background-color: #EEEEEE;
+  display: flex;
+  padding: 20px;
+  justify-content: center;
+}
+
+.foot a {
+  text-decoration: none;
+  color: green;
+  font-weight: normal;
+}
+
+.foot div:nth-child(1) {
+  margin-right: 20px;
+}
+
+.base {
+  display: flex;
+  background-color: #E0E1E1;
+  justify-content: center;
+  color: #616161;
+  align-items: center;
+}
+.base img {
+  height: 40px;
+  margin-right: 20px;
+}
+
 body {
   display: flex;
   flex-direction: column;
@@ -148,6 +267,4 @@ body {
   margin: 0;
   padding: 0;
   height: 100vh;
-  font-family: myfontTitle !important;
-  font-weight: 400 !important;
 }/*# sourceMappingURL=styles.css.map */

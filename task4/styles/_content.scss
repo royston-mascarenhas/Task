@@ -1,3 +1,5 @@
+@import "./font";
+
 .content{
     @include flex(column,#EEEEEE,none);
     flex-grow: 1;
@@ -18,19 +20,25 @@
         .login-title{
             @include flex(row,initial,center);
             margin-bottom: 20px;
-            font-family: myfontTitle !important;
-            font-weight: 700 !important;
             font-size: 1.5em;
             span{
+                @include myfont(900);
                 text-align: center;
                 flex-grow: 1;
             }
         }
         .login-radio{
+            input[type="radio"]{
+                height: 19px;
+                width: 19px;
+                accent-color: green;
+                margin-right: 10px;
+            }
             @include flex(row,initial,center);
             margin-bottom: 30px;
             flex-wrap: wrap;
             .radio-district,.radio-Independentschool{
+                @include myfont(700);
                 margin-right: 30px;
                 display:inline-flex;
                 align-items: center;
@@ -45,18 +53,49 @@
         .user-info{
             .state{
                 margin-bottom: 30px;
+                label{
+                    font-size: small;
+                    @include myfont(500);
+                }
+                select{
+                    @include myfont(700);
+                }
             }
             .district{
                 margin-bottom: 50px;
+                label{
+                    font-size: small;
+                    @include myfont(500);
+                }
+                select{
+                    @include myfont(700);
+                }
             }
             .username{
                 margin-bottom: 40px;
                 border:0;
+                input::placeholder{
+                    @include myfont(700);
+                }
                 div{
-                    text-align: right; font-size: large;
+                    @include myfont(700);
+                    text-align: right; 
+                    font-size: medium;
+                    color: #3fd28b;
+                    
+                    text-decoration: none;
+                    a{
+                        color: rgb(0, 95, 0); 
+                        text-decoration: none;
+                    }
                  }
+
             }
             .password{
+                
+                input::placeholder{
+                    @include myfont(700);
+                }
                 margin-bottom: 30px;
                 border:0;
                 .pass{
@@ -67,25 +106,37 @@
                 }
                 .eye{
                     text-align: right; 
-                    font-size: large;
+                    font-size: medium;
+                    a{
+                        @include myfont(700);
+                        color: rgb(0, 95, 0); 
+                        text-decoration: none;
+                    }
                 }
             }
             .remember-me{
+                input[type="checkbox"]{
+                    height: 19px;
+                    width: 19px;
+                    margin: 0px;
+                    margin-right: 5px;
+                }
+                @include myfont(700);
                 display: flex;
                 align-items: center;
                 margin-bottom: 30px;
             }
             .login{
                 text-align: center;
-            }
-            .login button{
-                padding: 10px 80px;
-                border: 0;
-                border-radius: 4px;
-                font-size: large;
-                background-color: #3fd28b;
-                color: black;
-                font-size: 16px;
+                button{
+                    padding: 10px 80px;
+                    border: 0;
+                    border-radius: 4px;
+                    font-size: medium;
+                    background-color: #3fd28b;
+                    color: black;
+                    @include myfont(700);
+                }
             }
             select{ 
                 width: 100% !important;

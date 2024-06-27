@@ -1,0 +1,32 @@
+@font-face {
+    font-family: myfontTitle;
+    src: url(../../quantum_screen_assets/Quicksand_font_1/static/Quicksand-Bold.ttf);
+    font-weight: 900;
+}
+
+@font-face {
+    font-family: myfontTitle;
+    src: url(../../quantum_screen_assets/Quicksand_font_1/static/Quicksand-SemiBold.ttf);
+    font-weight: 700;
+}
+@font-face {
+    font-family: myfontTitle;
+    src: url(../../quantum_screen_assets/Quicksand_font_1/static/Quicksand-Medium.ttf);
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: myfontTitle;
+    src: url(../../quantum_screen_assets/Quicksand_font_1/static/Quicksand-Regular.ttf);
+    font-weight: 300;
+}
+@font-face {
+    font-family: myfontTitle;
+    src: url(../../quantum_screen_assets/Quicksand_font_1/static/Quicksand-Light.ttf);
+    font-weight: 100;
+}
+
+@mixin myfont($fontweigh){
+    font-family: myfontTitle;
+    font-weight: $fontweigh;
+}

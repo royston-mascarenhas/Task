@@ -1,16 +1,13 @@
 @import "./function";
 @import "./content";
 @import "./nav";
-
-
+@import "./foot";
+@import "./base";
 body{
-
     @include flex(column,#EEEEEE,none);
     margin: 0;
     padding: 0;
     height:100vh;
-    font-family: myfontTitle !important;
-    font-weight: 400 !important;
 }
 
 
