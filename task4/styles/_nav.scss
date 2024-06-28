@@ -1,13 +1,282 @@
 @import "./function";
 
 nav{
-    @include flex(row,#1c2530,center);
-    padding:0px 14px;
+    @include flex(row,#1c2530,initial);
     text-align: center;
     width: 100%;
     box-sizing: border-box;
     img{
         padding: 8px;
+        padding-right: 0;
         height: 50px;
     }
+
+    .nav-info{
+        @include flex(row,initial,center);
+        box-sizing: border-box;
+        height: 100%;
+        align-content: center;
+        .nav-info-child{
+            align-content: center;
+            height: 100%;
+            padding: 0 12px;
+            color:#3FD28B;
+            @include myfont(500);
+            text-transform: uppercase;
+            font-size: medium;
+        }
+        i{
+            display: none;
+        }
+    }
+    div .active{
+        border-bottom:8px solid white;
+        color: white !important; 
+        box-sizing: border-box;
+    }
+    i{
+        padding: 0 12px;
+        color: #3FD28B;
+    }
+    .nav-icons{
+        display: flex;
+        margin: 0;
+        padding: 0;
+        .bell,.bullhorn,.profile-img{
+            align-content: center;
+        }
+        
+    }
+    .grow{
+        flex-grow: 1;
+        padding: 0;
+    }
+
+    .profile-img{
+        padding: 0;
+        align-content: center;
+        img{
+            height: 30px;
+            width: 30px; 
+            border-radius: 50%;
+            padding: 0 12px;
+         }
+    }
+    .fa.fa-bars.bars{
+        display:none;
+    }
+
+    .bars-info{
+        display: none;
+    }
+    .hidden{
+        display: none;
+    }
+
+    .div-par{
+        background-color:#FFFFFF ;
+    }
+    .grey{
+        background-color:#F3F3F3 ;
+    }
+
+    
+
+
+    .nav-icons{
+
+        .bell{
+            &:hover .div-parent{
+                display: flex;
+            }
+            position: relative;
+
+            .div-parent{
+                @include myfont(500);
+                z-index: 1;
+                box-shadow: 0px 3px 6px #00000029;
+                background-color: #FFFFFF;
+                top:67px;
+                right:5px;
+                position: absolute;
+                display:none;
+                flex-direction: column;
+                width: 315px; 
+                height: 582px;
+                text-align: start;
+            }
+            
+            .div-parent-top{
+                overflow-y:scroll; 
+                flex-grow:1 ;
+            }
+            
+            .div-child{
+                border: 0;
+                border-bottom: solid 1px #00000029 ;
+                padding: 10px; 
+                box-sizing: border-box;
+            
+            }
+            
+            .div-parent-bottom{
+                display: grid;
+                grid-template-columns: auto auto;
+                padding: 10px;
+                button{
+                    color: #1F7A54;
+                    border: none;
+                    background-color: #FFFFFF;
+                    display: inline-block;
+                    padding: 10px;
+                }
+            }
+            
+
+        }
+        .bullhorn{
+
+            &:hover .div-parent{
+                display: flex;
+            }
+
+            position: relative;
+            .div-parent{
+                @include myfont(500);
+                z-index: 1;
+                box-shadow: 0px 3px 6px #00000029;
+                background-color: #FFFFFF;
+                top:67px;
+                right:5px;
+                position: absolute;
+                display:none;
+                flex-direction: column;
+                width: 315px; 
+                height: 582px;
+                text-align: start;
+            }
+            
+            .div-parent-top{
+                
+                overflow-y:scroll; 
+                flex-grow:1 ;
+            }
+            
+            .div-child{
+                border: 0;
+                border-bottom: solid 1px #00000029 ;
+                padding: 10px;
+                box-sizing: border-box;
+            
+            }
+            
+            .div-parent-bottom{
+                display: grid;
+                grid-template-columns: auto;
+                padding: 10px;
+                button{
+                    color: #1F7A54;
+                    border: none;
+                    background-color: #FFFFFF;
+                    display: inline-block;
+                    padding: 10px;
+                }
+            }
+            
+            
+            
+
+        }
+        
+    }
+
+    @media screen and (max-width:1100px){
+       
+        .bars-icon{
+            align-content: center;
+            &:hover .bars-info{
+                display: flex;
+            }
+            position: relative;
+
+            .fa.fa-bars.bars{
+                display:block;
+            }
+
+            .bars-info{
+                position: absolute;
+                display: none;
+                flex-direction: column;
+                top:67px;
+                right:10px;
+                width: 280px;
+                text-transform: uppercase;
+                z-index: 1;
+                @include myfont(700);
+                .bars-info-child{
+                    padding: 10px;
+                    background-color: #FFFFFF;
+                    text-align: start;
+                    color: #1F7A54;
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 10px; 
+                    &.hidden{
+                        display: none;
+                        
+                    } 
+                    &.gray{
+                        justify-content: center;
+                        background-color:#F3F3F3;
+
+                    }
+                    &.grey{
+                        background-color:#F3F3F3;
+                    }
+                }
+                
+                
+            }
+
+        }
+
+        .nav-info{
+            display: none;
+        }
+        
+        .fa-solid.fa-chevron-down{
+            &.rotate{
+                transform: rotate(180deg);
+            }
+        }
+
+    }
+
+    @media screen and (max-width:400px){
+        padding: 0 6px;
+
+        i{
+            padding: 0 4px;
+        }
+
+        .profile-img{
+            img{
+                
+                padding: 0 4px;
+             }
+        }
+        div{
+            padding: 0;
+        }
+
+        img{
+            padding: 0px;
+            padding-right: 0;
+            height: 50px;
+        }
+
+        
+    }
+
+
 }
