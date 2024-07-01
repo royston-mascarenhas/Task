@@ -60,6 +60,7 @@ for(let i=0;i<bullhorn.length;i++){
 
   markup2 +=`
     <div class="div-child">
+    <i class="fa-solid fa-circle-minus"></i>
         <div style="display: flex;">
             <div style="margin-bottom: 10px;font-size: small;">
                     <span style="color: #6E6E6E;">PA:</span><span style="color: black" >${bullhorn[i].PA}</span>

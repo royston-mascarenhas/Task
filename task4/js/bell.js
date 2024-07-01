@@ -53,6 +53,7 @@ for(let i=0;i<bell.length;i++){
 
   markup1 +=`
   <div class="div-child">
+  <i class="fa-solid fa-circle-minus"></i>
         <div style="margin-bottom: 10px;">
         ${bell[i].alert}
         </div>

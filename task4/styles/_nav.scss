@@ -85,6 +85,8 @@ nav{
 
     .nav-icons{
 
+        
+
         .bell{
             &:hover .div-parent{
                 display: flex;
@@ -92,6 +94,8 @@ nav{
             position: relative;
 
             .div-parent{
+
+                
                 @include myfont(500);
                 z-index: 1;
                 box-shadow: 0px 3px 6px #00000029;
@@ -112,10 +116,20 @@ nav{
             }
             
             .div-child{
+                position: relative;
                 border: 0;
                 border-bottom: solid 1px #00000029 ;
-                padding: 10px; 
+                padding: 10px;
+                padding-right: 10px; 
                 box-sizing: border-box;
+                box-sizing: border-box;
+                .fa-solid.fa-circle-minus{
+                    position: absolute;
+                    right:0px;
+                    top:3px;
+                }
+
+                
             
             }
             
@@ -163,10 +177,16 @@ nav{
             }
             
             .div-child{
+                position: relative;
                 border: 0;
                 border-bottom: solid 1px #00000029 ;
                 padding: 10px;
                 box-sizing: border-box;
+                .fa-solid.fa-circle-minus{
+                    position: absolute;
+                    right:5px;
+                    top:10px;
+                }
             
             }
             
@@ -182,9 +202,6 @@ nav{
                     padding: 10px;
                 }
             }
-            
-            
-            
 
         }
         

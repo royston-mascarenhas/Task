@@ -10,6 +10,7 @@ let cards=[
         "unit":4,
         "lesson":18,
         "topics":24,
+        "border":"border-right: 1px solid grey",
         "class":{
 
                 "name":"Mr Frank's Class B",
@@ -31,6 +32,7 @@ let cards=[
             "year":6,
             "addition":3
         },
+        "border":"none",
         "unit":2,
         "lesson":15,
         "topics":20,
@@ -55,6 +57,7 @@ let cards=[
             "year":4,
             "addition":1
         },
+        "border":"none",
         "unit":4,
         "lesson":18,
         "topics":24,
@@ -81,6 +84,7 @@ let cards=[
             "year":7,
             "addition":2
         },
+        "border":"border-right: 1px solid grey",
         "unit":4,
         "lesson":18,
         "topics":24,
@@ -124,7 +128,7 @@ for(let i=0;i<4;i++){
                   ${cards[i].subject}
                   </div>
     
-                  <div style="padding-left: 9px;font-size: small;">Grade ${cards[i].grade.year}<span style="color: #1F7A54;">${cards[i].grade.addition}</span></div>
+                  <div style="padding-left: 9px;font-size: small;">Grade ${cards[i].grade.year}<span style="color: #1F7A54;">+ ${cards[i].grade.addition}</span></div>
                 </div>
     
                 <div style="margin-bottom: 20px;font-size:small; height: 15px;">
@@ -142,13 +146,13 @@ for(let i=0;i<4;i++){
                 </div>
     
                 <div style="margin-bottom: 10px; height: 15px;">
-                  <span style="border-right: 1px solid grey; font-size:small;">
+                  <span style=" ${cards[i].border}; font-size:small;">
                     ${cards[i].class.students} 
                   </span>
     
-                  <span style="padding-left: 20px;font-size:small;"> ${cards[i].class.date.from}</span>
+                  <span style="padding-left: 20px;font-size:small;">${cards[i].class.date.from}</span>
     
-                  <span style="font-size:small;">  ${cards[i].class.date.to}</span>
+                  <span style="font-size:small;">${cards[i].class.date.to}</span>
                 </div>
               </div>
             </div>
