@@ -430,7 +430,6 @@ input[type="checkbox"]{
     -webkit-box-flex: initial;
     box-flex: initial;
     border-bottom: 1px solid #a8a3a3; 
-    padding: 10px;
 }
 
 .course-card-top{

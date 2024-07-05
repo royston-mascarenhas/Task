@@ -1,0 +1,163 @@
+body{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+nav{
+    padding:0px 14px;
+    background-color:#000000;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box; 
+}
+
+nav img{
+    padding: 10px;
+    height: 50px;
+}
+
+.index-content{
+    flex-grow: 1;
+    background-color: rgb(236, 228, 228);
+}
+
+#drop_zone {
+    border: 1px dotted rgb(0, 0, 0);
+    border-radius: 8px;
+    height: 100px;
+    margin:20px;
+    text-align: center;
+  }
+
+.index-content-upload{
+    background-color: white;
+    max-width: 1200px;
+    margin: 50px auto 50px auto;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.index-content-upload-buttons{
+    display: flex;
+    margin: 20px;
+    justify-content: center;
+}
+
+.index-content-upload-buttons .button{
+    background-color: #ffffff;
+    margin: 10px 10px;
+    padding: 20px;
+    color: #21AE66;
+    font-weight: medium;
+    font-size: large;
+    border-radius: 20px;
+    border:1px solid #21AE66;
+}
+
+.index-content-upload-buttons label div{
+    margin: 20px;
+    background-color: #ffffff;
+    margin: 10px 10px;
+    padding: 20px;
+    color: #21AE66;
+    font-size: large;
+    border-radius: 20px;
+    border:1px solid #21AE66;
+}
+.index-content-upload-buttons .drop{
+    width: 100%;
+}
+
+
+.index-file{
+    background-color: white;
+    margin: 40px auto;
+    max-width: 1800px;
+    border-radius: 10px;
+}
+
+.result{
+    display:flex;
+    justify-content: space-between;
+    -webkit-box-flex: initial;
+    box-flex: initial;
+    border-bottom: 1px solid #a8a3a3; 
+    padding: 10px;
+}
+
+.index-file-child{
+    display: flex;
+    border-bottom: 1px solid rgb(165, 164, 164);
+}
+
+.index-file-grid{
+    padding: 20px;
+}
+
+.index-file-child img{
+    height: 60px;
+}
+
+.fa.fa-trash{
+    color: red;
+}
+
+.pagination {
+    display: inline-block;
+  }
+  
+  .pagination a {
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+  }
+
+.upload-div{
+    display: none;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    background-color: rgba(0,0,0,0);
+}
+
+
+.upload-div-show{
+    display: block;
+}
+
+
+
+
+.sheet{
+    border:1px solid black;
+}
+
+.hidden{
+    display:none;
+
+}
+.textbox{
+    box-sizing:border-box;
+    z-index:'1';
+    height:30px;
+    width:100px;
+    position:absolute;
+    background:white;
+    outline: none;
+}
+
+.home-content-upload-buttons label div{
+    margin: 20px;
+    background-color: #ffffff;
+    margin: 10px 10px;
+    padding: 20px;
+    color: #21AE66;
+    font-size: large;
+    border-radius: 20px;
+    border:1px solid #21AE66;
+}
