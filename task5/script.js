@@ -1,12 +1,14 @@
 let headers=[];
 let data = [];
+let canvas = document.getElementById("canvas");
+let ctx = canvas.getContext("2d");
+var sizel = 100;
+var sizeb = 30;
+var x5=null;
+var y5=null;
 
 function excel()
 {
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
-var sizel = 100;
-var sizeb = 30;
 var row = data.length;
 var col = headers.length;
 var height1 =sizeb*row+sizeb;
@@ -58,19 +60,18 @@ function showCoords(canvas,event) {
 
     let x1=Math.floor(x/100) ;
     let y1=Math.floor(y/30) ;
-
     console.log(x1,y1);
     return([x1,y1]);
-
-    
   }
 
   
   canvas.addEventListener("click",function (e){
-    var [x1,y1]=showCoords (canvas,e);
-    css(x1,y1);
+    [x5,y5]=showCoords (canvas,e);
+
+    css(x5,y5);
   });
 
+  
 
 function css(x,y)
 {    
@@ -78,14 +79,34 @@ function css(x,y)
     textbox.classList.toggle("hidden");
     textbox.style.left=`${100*x}px`;
     textbox.style.top=`${30*y}px`;
-    textbox.value=" ";
-    textbox.focus()
+    textbox.value=data[y-1][headers[x]];
+    textbox.focus();
 
 }
 
+
 }
+var textbox = document.getElementById('text');
+textbox.addEventListener("blur", function abc(event) {
+    console.log("hello");
+    var t1= event.target.value;
+    var x2=x5*sizel;
+    var y2=y5*sizeb;
+    console.log(t1);
+    ctx.clearRect(x2,y2+1,sizel,sizeb);
+    ctx.fillStyle = "white";
+    ctx.strokestyle="black";
+    ctx.font =`${18}px areal `;
+    ctx.fillStyle = "black";
+    ctx.fillText(t1,x2,(y2+sizeb)-10);
+    ctx.strokeRect(x2,y2,sizel,sizeb);
 
 
+    if(event.key === "Enter"){
+        textbox.classList.toggle("hidden");
+        textbox.removeEventListener("keyup",abc);
+    }            
+});
     document.getElementById('file').addEventListener('change', function(event) { 
         var nofile = document.getElementById('nofile');
         nofile.classList.toggle("hidden");
@@ -109,9 +130,6 @@ function css(x,y)
         reader.readAsText(file); 
 
     }); 
-
-
-   
 
     function csvToJson(csv) { 
 
