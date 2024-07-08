@@ -88,7 +88,6 @@ function css(x,y)
 }
 var textbox = document.getElementById('text');
 textbox.addEventListener("blur", function abc(event) {
-    console.log("hello");
     var t1= event.target.value;
     var x2=x5*sizel;
     var y2=y5*sizeb;
