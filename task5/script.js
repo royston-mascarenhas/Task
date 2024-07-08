@@ -147,7 +147,6 @@ textbox.addEventListener("blur", function abc(event) {
         } 
         return result; 
     }
-
 // function readcsv(){
 //     const reader = new FileReader()
 
