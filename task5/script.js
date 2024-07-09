@@ -6,6 +6,14 @@ var sizel = 100;
 var sizeb = 30;
 var x5=null;
 var y5=null;
+var textbox = document.getElementById('text');
+var xstart=null;
+var ystart=null;
+var xend=null;
+var yend=null;
+var sum=0;
+var arr=[];
+
 
 function excel()
 {
@@ -66,9 +74,10 @@ function showCoords(canvas,event) {
 
   
   canvas.addEventListener("click",function (e){
+    
     [x5,y5]=showCoords (canvas,e);
-
     css(x5,y5);
+    e.stopPropagation()
   });
 
   
@@ -86,21 +95,21 @@ function css(x,y)
 
 
 }
-var textbox = document.getElementById('text');
+
 textbox.addEventListener("blur", function abc(event) {
     var t1= event.target.value;
     var x2=x5*sizel;
     var y2=y5*sizeb;
+    data[y5-1][headers[x5]]=t1;
     console.log(t1);
     ctx.clearRect(x2,y2+1,sizel,sizeb);
     ctx.fillStyle = "white";
     ctx.strokestyle="black";
     ctx.font =`${18}px areal `;
     ctx.fillStyle = "black";
-    ctx.fillText(t1,x2,(y2+sizeb)-10);
+    
+    ctx.fillText(t1,x2+2,(y2+sizeb)-10);
     ctx.strokeRect(x2,y2,sizel,sizeb);
-
-
     if(event.key === "Enter"){
         textbox.classList.toggle("hidden");
         textbox.removeEventListener("keyup",abc);
@@ -130,7 +139,143 @@ textbox.addEventListener("blur", function abc(event) {
 
     }); 
 
-    function csvToJson(csv) { 
+var active=false;
+
+function mousemove(e) {
+
+    let rect= canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    let x1=Math.floor(x/100) ;
+    let y1=Math.floor(y/30) ;
+
+    for(var i=xstart;i<=x1;i++){
+        for(var j=ystart; j<=y1; j++){
+            ctx.fillStyle = "#ADD8E6";
+            ctx.strokestyle="black";
+
+            ctx.fillRect(100*i,30*j,sizel,sizeb);
+
+            ctx.strokeRect(100*i,30*j,sizel,sizeb);
+            ctx.stroke();
+
+            ctx.font =`${18}px areal `;
+            ctx.fillStyle = "black";
+            ctx.fillText(data[j-1][headers[i]],100*i+2,30*(j+1)-10);
+        }
+    }
+    
+
+};
+
+function mousedown(e){
+    let rect= canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    xstart=Math.floor(x/100) ;
+    ystart=Math.floor(y/30) ;
+    console.log(xstart,ystart);
+
+    canvas.addEventListener("mousemove",mousemove);
+
+    canvas.addEventListener("mouseup",function mouseup(e) {
+        canvas.removeEventListener("mousemove",mousemove)
+        excel()
+        let rect= canvas.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+    
+        let xend=Math.floor(x/100) ;
+        let yend=Math.floor(y/30) ;
+        console.log(xend,yend);
+        // if (isDrawing) {
+        //   drawLine(context, x, y, e.offsetX, e.offsetY);
+        //   x = 0;
+        //   y = 0;
+        //   isDrawing = false;
+        // }
+
+        for(var i=xstart;i<=xend;i++){
+            for(var j=ystart-1; j<yend; j++){
+                arr.push(data[j][headers[i]]);
+
+                console.log(data[j][headers[i]]);
+                sum+=parseInt(data[j][headers[i]]);
+            } 
+        }
+        console.log(sum);
+       
+        const max = Math.max(...arr);
+        const min = Math.min(...arr);
+
+        console.log(max);
+        console.log(min);
+
+        var element = document.getElementById("add-val");
+        var element1 = document.getElementById("avg-val");
+        var element2 = document.getElementById("max-val");
+        var element3 = document.getElementById("min-val");
+
+        element.value="Sum = "+sum;
+        element1.value="Avg = "+(sum/arr.length).toPrecision(6);
+        element2.value="Max = "+max;
+        element3.value="Min = "+min;
+        sum=0;
+        arr=[];
+       
+
+        canvas.removeEventListener("mouseup",mouseup);
+    });
+
+
+    
+}
+
+canvas.addEventListener("mousedown",mousedown);
+// function math(){
+//     addactive();
+//     if(active) {
+//         active = false;
+//     }else{
+//         active = true;
+//     }
+    
+    // if(active){
+    // }
+    // else{
+    // }
+        // canvas.removeEventListener("mousedown",xyz);
+        // var element = document.getElementById("add-val");
+        // element.value="Sum...";
+        // var element1 = document.getElementById("avg-val");
+        // element1.value="Average...";
+        // var element2 = document.getElementById("max-val");
+        // element2.value="Max...";
+        // var element3 = document.getElementById("min-val");
+        // element3.value="Min...";
+     
+    // canvas.addEventListener("mousemove", (e) => { 
+    //     let rect= canvas.getBoundingClientRect();
+    //     let x = e.clientX - rect.left;
+    //     let y = e.clientY - rect.top;
+    
+    //     let x1=Math.floor(x/100) ;
+    //     let y1=Math.floor(y/30) ;
+    //     console.log(x1,y1);
+    
+    // });
+// }
+
+function addactive() {
+    var element = document.getElementById("math");
+    element.classList.toggle("active");
+}
+
+
+
+function csvToJson(csv) { 
 
         const lines = csv.split('\n'); 
         const result = []; 
@@ -146,7 +291,7 @@ textbox.addEventListener("blur", function abc(event) {
             result.push(obj); 
         } 
         return result; 
-    }
+}
 // function readcsv(){
 //     const reader = new FileReader()
 

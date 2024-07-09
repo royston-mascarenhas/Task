@@ -151,7 +151,7 @@ nav img{
     outline: none;
 }
 
-.home-content-upload-buttons label div{
+.home-content-upload-buttons label div,.home-content-add-buttons{
     margin: 20px;
     background-color: #ffffff;
     margin: 10px 10px;
@@ -160,4 +160,15 @@ nav img{
     font-size: large;
     border-radius: 20px;
     border:1px solid #21AE66;
+}
+
+.active{
+    margin: 20px;
+    background-color: #ff0101;
+    margin: 10px 10px;
+    padding: 20px;
+    color: #21AE66;
+    font-size: large;
+    border-radius: 20px;
+    border:1px solid #98c203;
 }
