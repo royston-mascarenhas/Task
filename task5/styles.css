@@ -130,16 +130,12 @@ nav img{
     display: block;
 }
 
-
-
-
 .sheet{
     border:1px solid black;
 }
 
 .hidden{
     display:none;
-
 }
 .textbox{
     box-sizing:border-box;
