@@ -1,7 +1,7 @@
 var window_height = window.innerHeight;
-      var window_width = window.innerWidth;
+var window_width = window.innerWidth;
 
-      class Excel {
+class Excel {
     
         constructor(csv,container) {
           this.csv = csv;
@@ -14,13 +14,11 @@ var window_height = window.innerHeight;
           this.activeCell;
           this.val=false;
           // this.canvas.addEventListener("mousedown",(e)=>this.mousedown(e,this.canvas))
-      
-          
-      }
+    }
         
         init() {
           this.createcanvas();
-        }
+    }
         
         createcanvas() {
         this.textbox=document.createElement("input")
@@ -67,30 +65,26 @@ var window_height = window.innerHeight;
         this.textbox.addEventListener("blur",(e)=>this.textset(e,this.canvas));
 
         this.header.addEventListener("mousemove",(e)=>this.resize(e,this.header));
- 
-
-      }
+    }
 
         resize(e,header){
+        let rect= header.getBoundingClientRect();
+        let x = e.clientX -rect.left-100;
+        let sum=0;
 
-      let rect= header.getBoundingClientRect();
-      let x = e.clientX -rect.left-100;
-      
-      let sum=0;
-
-      for (let i = 0; i <this.arr_width.length; i++) {
-          const edge =this.arr_width[i];
-          if(sum+4>x && x>sum){
-              header.style.cursor="col-resize"
-              header.addEventListener("mousedown",(e)=>this.resize_mousedown(e,this.header))
-              break;
-          }
-        else{
-          // header.removeEventListener("mousedown",resize_mousedown)
-          header.style.cursor="default"
+        for (let i = 0; i <this.arr_width.length; i++) {
+            const edge =this.arr_width[i];
+            if(sum+4>x && x>sum){
+                header.style.cursor="col-resize"
+                header.addEventListener("mousedown",(e)=>this.resize_mousedown(e,this.header))
+                break;
+            }
+            else{
+            // header.removeEventListener("mousedown",resize_mousedown)
+            header.style.cursor="default"
+            }
+            sum+=edge
         }
-          sum+=edge
-      }
     }
 
         csvToExcel() {
@@ -101,7 +95,6 @@ var window_height = window.innerHeight;
           let counter=0
 
           for (let j = 0; j < headers.length; j++) {
-            
             let rectData = {};
             rectData["xpos"] = counter;
             rectData["ypos"] = 0;
@@ -110,14 +103,13 @@ var window_height = window.innerHeight;
             rectData["color"] = "black";
             rectData["data"] = headers[j];
             rectData["lineWidth"] = 1;
-
             rectData["rows"] = 0;
             rectData["cols"] = j;
             header1d.push(rectData);
             this.createCell(rectData,this.ctx);
-
             counter+=this.arr_width[j]
           }
+
           this.arr2d.push(header1d);
 
           for (let i = 1; i < lines.length; i++) {
@@ -143,7 +135,7 @@ var window_height = window.innerHeight;
           console.log(this.arr2d);
 
           this.activeCell=this.arr2d[0][0]
-        }
+    }
         
         createCell(data,x) {
           console.log(data)
@@ -157,7 +149,7 @@ var window_height = window.innerHeight;
           x.fillText(data.data,data.xpos + 10, data.ypos + data.height - 5);
          
           x.stroke();
-        }
+    }
 
         createHighCell(data,x) {
           console.log(data)
@@ -168,16 +160,15 @@ var window_height = window.innerHeight;
           x.fillStyle = "black";
           x.lineWidth=4;
           x.stroke();
-        }
+    }
         
         clearCell(data,x){
           x.clearRect(data.xpos,data.ypos,data.width,data.height);
-        }
+    }
 
         clearHighCell(data,x){
-
-          x.clearRect(data.xpos-2,data.ypos-2,data.width+4,data.height+4);
-      }
+            x.clearRect(data.xpos-2,data.ypos-2,data.width+4,data.height+4);
+    }
  
         drawHeader() {
         let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -198,7 +189,8 @@ var window_height = window.innerHeight;
             counter+=this.arr_width[j]
             
           }
-          counter=0
+
+        counter=0
           for (let j = 0; j < arr.length; j++) {
        
             let rectDatahead = {};
@@ -213,7 +205,7 @@ var window_height = window.innerHeight;
             this.createCell(rectDatahead,this.htx);
             counter+=this.arr_width[j]
           }
-        }
+    }
 
         drawSidebar() {
         // let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -233,7 +225,7 @@ var window_height = window.innerHeight;
             header1dhead.push(rectDatahead);
             this.createCell(rectDatahead,this.stx);
           }
-      }
+    }
       
         click(e,canvas){
             let n = (e)=>this.keyMove(e,this.canvas,x5,y5)
@@ -249,19 +241,17 @@ var window_height = window.innerHeight;
               window.addEventListener("keydown",n);
               this.val=true
             }
-        }
+    }
 
         mousemove(e,canvas,cell_initial) {
-
           let [x1,y1,sum]=this.showCoords(this.canvas,e);
           this.cell_final=this.arr2d[y1][x1-1]
           console.log("This is the start Cell"+cell_initial)
           console.log("This is the end Cell"+this.cell_final)
-          
           this.createHighCell(this.cell_final,this.ctx)
-
           canvas.addEventListener("mouseup",(e)=>this.mouseup(e,canvas))
-            // canvas.removeEventListener("mousedown",this.mousedown)
+            
+          // canvas.removeEventListener("mousedown",this.mousedown)
             // canvas.removeEventListener("mouseup",mouseup);
           // for(var i=x5;i<=x1;i++){
           //     for(var j=y5; j<=y1; j++){
@@ -269,19 +259,18 @@ var window_height = window.innerHeight;
           //     }
               
           // }
-        };
+    }
 
         mouseup(e,canvas){
           canvas.removeEventListener("mousemove",this.mousemove)
           canvas.removeEventListener("mousedown",this.mousemove)
-        }
+    }
 
         keyMove(e,canvas,x5,y5){
           this.clearHighCell(this.activeCell,this.ctx)
           this.createCell(this.activeCell,this.ctx)
-
           let{rows,cols}=this.activeCell
-          
+
           if(e.which== 37) { 
             if(cols<=0){
               this.activeCell=this.arr2d[rows][cols]
@@ -290,7 +279,6 @@ var window_height = window.innerHeight;
               this.activeCell=this.arr2d[rows][cols-1]
               this.createHighCell(this.activeCell,this.ctx)
             }
-            
           }
           else if(e.which == 39) { 
               this.activeCell=this.arr2d[rows][cols+1]
@@ -310,7 +298,7 @@ var window_height = window.innerHeight;
             this.activeCell=this.arr2d[rows+1][cols]
             this.createHighCell(this.activeCell,this.ctx)
           }
-        }
+    }
   
         double_click(e ,canvas){
             let [x5,y5,sum]=this.showCoords(this.canvas,e);
@@ -318,7 +306,7 @@ var window_height = window.innerHeight;
             this.cell=this.arr2d[y5][x5-1]
             console.log(this.arr2d[y5][x5-1])
             this.textbox_visible(this.cell);
-        }
+    }
 
         textbox_visible(cell)
         {  
@@ -331,24 +319,15 @@ var window_height = window.innerHeight;
             this.textbox.style.zIndex="1"
             this.textbox.value=cell.data;
             this.textbox.focus();
-        }
+    }
         
         textset(event,canvas) {
           var t1= event.target.value;
-
           this.cell.data=t1;
           console.log(this.cell)
           this.clearCell(this.cell,this.ctx)
-          this.createCell(this.cell,this.ctx)
-
-       
-          if(event.key === "Enter"){
-              textbox.classList.toggle("hidden");
-              textbox.removeEventListener("keyup",abc);
-          }      
-          
-          
-          };
+          this.createCell(this.cell,this.ctx)       
+    }
 
         showCoords(canvas,event) {
           let rect= this.canvas.getBoundingClientRect();
@@ -367,33 +346,25 @@ var window_height = window.innerHeight;
           }
           let y1=Math.floor(y/30) ;
           return([rows,y1,sum-this.arr_width[rows-1]]);
-      }
+    }
 
         resize_mousedown(e,header) {
             this.textbox.style.display="none";
-
             let[x7,y1,total]=this.showCoords(this.header,e)
             console.log(x7,y1,total)
-
             this.prev_width=this.arr_width[x7-2];
             console.log("This is the width= "+this.prev_width)
-
             header.addEventListener('mousemove',(e)=> this.resize_mousemove(e,header,this.prev_width,x7,total))
-
             // canvas.addEventListener("mouseup", resize_mouseup)
             // canvas.removeEventListener("mouseup",resize_mouseup)
             // canvas.removeEventListener("mousedown",resize_mousedown)
-          }
+    }
 
         resize_mousemove(e,header,prev_width,x7,total) {
-
           let rect= header.getBoundingClientRect();
           let x2 = e.clientX - rect.left -100;
           let addition=(x2-total)
-
           header.addEventListener('mouseup',(e)=> this.resize_mouseup(e,header,prev_width,x7,addition))
-
-          
           // console.log(prev_width+(x2-total))
           // if(arr_width[x7-2]<40){
           //     arr_width[x7-2]=40
@@ -402,16 +373,14 @@ var window_height = window.innerHeight;
           // else{
           //     excel()
           // }
-        }
+    }
 
         resize_mouseup(e,header,prev_width,x7,addition) {
           this.arr_width[x7-2]=prev_width+addition
           console.log(this.arr_width)
           header.removeEventListener("mousemove",this.resize_mousemove)
           this.drawHeader()
-          
-         
-        }
+    }
 
         // mousedown(e,canvas){
 
@@ -493,9 +462,8 @@ var window_height = window.innerHeight;
     // //         })
     
     //     }   
-  
-  }
-      csv = `Sr. No.,First Name,Last Name,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age
+}
+    csv = `Sr. No.,First Name,Last Name,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age
       1,Roy,Mas,21,156,Male,291,426,Male,561,696,Male,831,966,Male,1101,1236,Male,1371,1506,Male,1641
       2,Ash,Lop,22,151,Male,280,409,Male,538,667,Male,796,925,Male,1054,1183,Male,1312,1441,Male,1570
       3,Rit,Kha,32,123,Female,214,305,Female,396,487,Female,578,669,Female,760,851,Female,942,1033,Female,1124
@@ -522,4 +490,4 @@ var window_height = window.innerHeight;
       24,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
       25,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039`;
 
-      let excel = new Excel(csv, document.querySelector(".container"));
+    let excel = new Excel(csv, document.querySelector(".container"));
