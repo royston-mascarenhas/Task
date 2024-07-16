@@ -176,23 +176,24 @@ class Excel {
         let header1dhead=[];
         let counter=0
 
-        for (let j = 0; j < arr.length; j++) {
-            let rectDatahead = {};
-            rectDatahead["xpos"] = counter+100;
-            rectDatahead["ypos"] = 0;
-            rectDatahead["width"] =this.arr_width[j];
-            rectDatahead["height"] = 30;
-            rectDatahead["color"] = "black";
-            rectDatahead["data"] = arr[j];
-            rectDatahead["lineWidth"] = 1;
-            this.clearCell(rectDatahead,this.htx);
-            counter+=this.arr_width[j]
-            
-          }
+        // for (let j = 0; j < arr.length; j++) {
+        //     let rectDatahead = {};
+        //     rectDatahead["xpos"] = counter+100;
+        //     rectDatahead["ypos"] = 0;
+        //     rectDatahead["width"] =this.arr_width[j];
+        //     rectDatahead["height"] = 30;
+        //     rectDatahead["color"] = "black";
+        //     rectDatahead["data"] = arr[j];
+        //     rectDatahead["lineWidth"] = 1;
 
-        counter=0
+        //     this.clearCell(rectDatahead,this.htx);
+
+        //     counter+=this.arr_width[j]
+            
+        //   }
+
+        // counter=0
           for (let j = 0; j < arr.length; j++) {
-       
             let rectDatahead = {};
             rectDatahead["xpos"] = counter+100;
             rectDatahead["ypos"] = 0;
@@ -205,6 +206,10 @@ class Excel {
             this.createCell(rectDatahead,this.htx);
             counter+=this.arr_width[j]
           }
+    }
+
+        drawHeaderClear(){
+            this.htx.clearRect(0,0,this.header.width,this.header.height)
     }
 
         drawSidebar() {
@@ -349,38 +354,47 @@ class Excel {
     }
 
         resize_mousedown(e,header) {
+            let addition
             this.textbox.style.display="none";
             let[x7,y1,total]=this.showCoords(this.header,e)
             console.log(x7,y1,total)
             this.prev_width=this.arr_width[x7-2];
             console.log("This is the width= "+this.prev_width)
-            header.addEventListener('mousemove',(e)=> this.resize_mousemove(e,header,this.prev_width,x7,total))
+
+            
             // canvas.addEventListener("mouseup", resize_mouseup)
             // canvas.removeEventListener("mouseup",resize_mouseup)
             // canvas.removeEventListener("mousedown",resize_mousedown)
+            var resize_mousemove=(e)=> {
+                let rect= header.getBoundingClientRect();
+                let x2 = e.clientX - rect.left -100;
+                addition=(x2-total)
+                header.addEventListener('mouseup',resize_mouseup)
+                // console.log(prev_width+(x2-total))
+                // if(arr_width[x7-2]<40){
+                //     arr_width[x7-2]=40
+                //     excel()
+                // }
+                // else{
+                //     excel()
+                // }
+          }
+
+          var resize_mouseup=(e)=> {
+            this.arr_width[x7-2]=this.prev_width+addition
+            console.log(this.arr_width)
+            header.removeEventListener("mousemove",resize_mousemove)
+            this.drawHeaderClear()
+            this.drawHeader()
+  
+      }
+      header.addEventListener('mousemove',resize_mousemove)
+            
     }
 
-        resize_mousemove(e,header,prev_width,x7,total) {
-          let rect= header.getBoundingClientRect();
-          let x2 = e.clientX - rect.left -100;
-          let addition=(x2-total)
-          header.addEventListener('mouseup',(e)=> this.resize_mouseup(e,header,prev_width,x7,addition))
-          // console.log(prev_width+(x2-total))
-          // if(arr_width[x7-2]<40){
-          //     arr_width[x7-2]=40
-          //     excel()
-          // }
-          // else{
-          //     excel()
-          // }
-    }
+        
 
-        resize_mouseup(e,header,prev_width,x7,addition) {
-          this.arr_width[x7-2]=prev_width+addition
-          console.log(this.arr_width)
-          header.removeEventListener("mousemove",this.resize_mousemove)
-          this.drawHeader()
-    }
+        
 
         // mousedown(e,canvas){
 
