@@ -2,11 +2,13 @@ var window_height = window.innerHeight;
 var window_width = window.innerWidth;
 
 class Excel {
+
+  arr_width=[100,200,100,200,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100]
     
         constructor(csv,container) {
           this.csv = csv;
           this.container = container;
-          this.arr_width=[100,200,100,200,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100]
+          
           this.init();
           this.csvToExcel();
           this.drawHeader()
@@ -65,6 +67,9 @@ class Excel {
         this.textbox.addEventListener("blur",(e)=>this.textset(e,this.canvas));
 
         this.header.addEventListener("mousemove",(e)=>this.resize(e,this.header));
+
+        
+
     }
 
         resize(e,header){
@@ -76,7 +81,7 @@ class Excel {
             const edge =this.arr_width[i];
             if(sum+4>x && x>sum){
                 header.style.cursor="col-resize"
-                header.addEventListener("mousedown",(e)=>this.resize_mousedown(e,this.header))
+                this.header.addEventListener("mousedown",(e)=>this.resize_mousedown(e,this.header))
                 break;
             }
             else{
@@ -93,6 +98,8 @@ class Excel {
           this.arr2d =[];
           let header1d=[];
           let counter=0
+
+          this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
 
           for (let j = 0; j < headers.length; j++) {
             let rectData = {};
@@ -135,10 +142,13 @@ class Excel {
           console.log(this.arr2d);
 
           this.activeCell=this.arr2d[0][0]
+         
     }
         
         createCell(data,x) {
-          console.log(data)
+          // console.log(data)
+          x.save();
+          x.beginPath();
          
           x.rect(data.xpos, data.ypos, data.width, data.height);
 
@@ -149,6 +159,7 @@ class Excel {
           x.fillText(data.data,data.xpos + 10, data.ypos + data.height - 5);
          
           x.stroke();
+          x.restore();
     }
 
         createHighCell(data,x) {
@@ -176,6 +187,11 @@ class Excel {
         let header1dhead=[];
         let counter=0
 
+        console.log("Drawed Header")
+
+        this.htx.clearRect(0,0,this.header.width,this.header.height)
+
+
         // for (let j = 0; j < arr.length; j++) {
         //     let rectDatahead = {};
         //     rectDatahead["xpos"] = counter+100;
@@ -193,7 +209,7 @@ class Excel {
         //   }
 
         // counter=0
-          for (let j = 0; j < arr.length; j++) {
+          for (let j = 0; j < this.arr_width.length; j++) {
             let rectDatahead = {};
             rectDatahead["xpos"] = counter+100;
             rectDatahead["ypos"] = 0;
@@ -202,14 +218,10 @@ class Excel {
             rectDatahead["color"] = "black";
             rectDatahead["data"] = arr[j];
             rectDatahead["lineWidth"] = 1;
-            header1dhead.push(rectDatahead);
+            // header1dhead.push(rectDatahead);
             this.createCell(rectDatahead,this.htx);
             counter+=this.arr_width[j]
           }
-    }
-
-        drawHeaderClear(){
-            this.htx.clearRect(0,0,this.header.width,this.header.height)
     }
 
         drawSidebar() {
@@ -354,22 +366,25 @@ class Excel {
     }
 
         resize_mousedown(e,header) {
-            let addition
+          
+            let addition=0;
             this.textbox.style.display="none";
             let[x7,y1,total]=this.showCoords(this.header,e)
             console.log(x7,y1,total)
+
             this.prev_width=this.arr_width[x7-2];
             console.log("This is the width= "+this.prev_width)
-
             
             // canvas.addEventListener("mouseup", resize_mouseup)
             // canvas.removeEventListener("mouseup",resize_mouseup)
             // canvas.removeEventListener("mousedown",resize_mousedown)
+
             var resize_mousemove=(e)=> {
                 let rect= header.getBoundingClientRect();
                 let x2 = e.clientX - rect.left -100;
                 addition=(x2-total)
-                header.addEventListener('mouseup',resize_mouseup)
+                console.log(addition)
+               
                 // console.log(prev_width+(x2-total))
                 // if(arr_width[x7-2]<40){
                 //     arr_width[x7-2]=40
@@ -379,16 +394,21 @@ class Excel {
                 //     excel()
                 // }
           }
+            var resize_mouseup=(e)=> {
 
-          var resize_mouseup=(e)=> {
             this.arr_width[x7-2]=this.prev_width+addition
             console.log(this.arr_width)
             header.removeEventListener("mousemove",resize_mousemove)
-            this.drawHeaderClear()
             this.drawHeader()
-  
+            this.csvToExcel()
+            header.removeEventListener('mouseup',resize_mouseup)
       }
       header.addEventListener('mousemove',resize_mousemove)
+      header.addEventListener('mouseup',resize_mouseup)
+  
+
+      
+
             
     }
 
