@@ -341,10 +341,9 @@ class Excel {
             for(var i=this.min_r;i<=this.max_r;i++){
                  for(var j=this.min_c; j<=this.max_c; j++){
                      this.final_cell=this.arr2d[i][j]
-                     this.math_sum+=parseInt(this.final_cell.data);
-                     this.arr_selected.push(this.final_cell.data)
+                     this.math_sum+=parseInt(this.final_cell.data)||0;
+                     this.arr_selected.push(parseInt(this.final_cell.data)||0)
                      this.createHighCell(this.final_cell,this.ctx)
-                    //  this.math_sum+=this.final_cell.data
                  }
              } 
           };
@@ -357,13 +356,14 @@ class Excel {
                   this.clearHighCell(this.final_cell,this.ctx)
                   this.createCell(this.final_cell,this.ctx)
               }
-          }
+            }
            
             canvas.removeEventListener("mousemove",mousemove)
             canvas.removeEventListener("mousedown",this.mousedown)
             console.log("MAX = "+Math.max(...this.arr_selected))
             console.log("MIN = "+Math.min(...this.arr_selected))
             console.log("SUM = "+this.math_sum)
+            canvas.removeEventListener("mouseup",mouseup)
           }
           canvas.addEventListener("mousemove",mousemove)
           canvas.addEventListener("mouseup",mouseup)
@@ -385,7 +385,6 @@ class Excel {
                 if(this.arr_width[x7-2]<50){
                   this.arr_width[x7-2]= 50
                 }
-    
                 else{
                   this.arr_width[x7-2]=this.prev_width+addition
                 }
@@ -394,7 +393,6 @@ class Excel {
                 this.csvToExcel()
           }
             var resize_mouseup=(e)=> {
-           
             header.removeEventListener("mousemove",resize_mousemove)
             header.removeEventListener('mouseup',resize_mouseup)
       }
