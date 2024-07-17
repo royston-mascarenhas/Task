@@ -318,7 +318,6 @@ class Excel {
     }
 
         mousedown(e,canvas){
-
           this.clearHighCell(this.activeCell,this.ctx)
           this.createCell(this.activeCell,this.ctx)
           let [x5,y5,sum]=this.showCoords(this.canvas,e);
@@ -347,8 +346,7 @@ class Excel {
                      this.createHighCell(this.final_cell,this.ctx)
                     //  this.math_sum+=this.final_cell.data
                  }
-             }
-            
+             } 
           };
 
           var mouseup=(e)=> {
@@ -381,20 +379,22 @@ class Excel {
                 let rect= header.getBoundingClientRect();
                 let x2 = e.clientX - rect.left -100;
                 addition=(x2-total)
+
+                this.arr_width[x7-2]=this.prev_width+addition
+
+                if(this.arr_width[x7-2]<50){
+                  this.arr_width[x7-2]= 50
+                }
+    
+                else{
+                  this.arr_width[x7-2]=this.prev_width+addition
+                }
+        
+                this.drawHeader()
+                this.csvToExcel()
           }
             var resize_mouseup=(e)=> {
-            this.arr_width[x7-2]=this.prev_width+addition
-
-            if(this.arr_width[x7-2]<50){
-              this.arr_width[x7-2]= 50
-            }
-
-            else{
-              this.arr_width[x7-2]=this.prev_width+addition
-            }
-    
-            this.drawHeader()
-            this.csvToExcel()
+           
             header.removeEventListener("mousemove",resize_mousemove)
             header.removeEventListener('mouseup',resize_mouseup)
       }
