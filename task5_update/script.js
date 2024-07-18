@@ -1,7 +1,5 @@
-var window_height = window.innerHeight;
-var window_width = window.innerWidth;
 class Excel {
-  arr_width=[100,200,100,200,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100]
+  arr_width=[100,200,100,200,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100]
     
       constructor(csv,container) {
           this.csv = csv;
@@ -18,6 +16,7 @@ class Excel {
           this.min_r=0
           this.math_sum=0
           this.arr_selected=[]
+          this.extendData(10,1)
           // this.canvas.addEventListener("mousedown",(e)=>this.mousedown(e,this.canvas))
     }
         
@@ -43,6 +42,7 @@ class Excel {
         
         
         this.canvas_parent=document.createElement("div")
+          this.canvas_parent.id="canvas_parent"
 
         this.canvas_parent.style.position="relative"
         this.textbox.style.position="absolute"
@@ -50,6 +50,7 @@ class Excel {
         let canvas = document.createElement("canvas")
         canvas.width = this.container.offsetWidth - 100
         canvas.height = this.container.offsetHeight - 30
+        canvas.id="canvas"
 
         this.canvas=canvas
 
@@ -67,6 +68,20 @@ class Excel {
         this.canvas.addEventListener("mousedown", (e)=>this.mousedown(e,this.canvas))
         this.textbox.addEventListener("blur",(e)=>this.textset(e,this.canvas));
         this.header.addEventListener("mousemove",(e)=>this.resize(e,this.header));
+        window.onscroll = function() {myFunction()};
+
+        function myFunction() {
+
+          const element = document.getElementById("container");
+          let x = element.scrollTop;
+          console.log(x);
+
+          // if (document.documentElement.scrollLeft > 100) {
+          //   canvas.width = this.container.offsetWidth - 100+200
+          // }
+        }
+
+
     }
 
         resize(e,header){
@@ -93,7 +108,7 @@ class Excel {
           const lines = this.csv.split("\n");
           let headers = lines[0].split(",");
           this.arr2d =[];
-          let header1d=[];
+          this.header1d=[];
           let counter=0
 
           this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
@@ -109,12 +124,12 @@ class Excel {
             rectData["lineWidth"] = 1;
             rectData["rows"] = 0;
             rectData["cols"] = j;
-            header1d.push(rectData);
+            this.header1d.push(rectData);
             this.createCell(rectData,this.ctx);
             counter+=this.arr_width[j]
           }
 
-          this.arr2d.push(header1d);
+          this.arr2d.push(this.header1d);
 
           for (let i = 1; i < lines.length; i++) {
             counter=0
@@ -139,11 +154,12 @@ class Excel {
           this.activeCell=this.arr2d[0][0]
          
     }
+    
         
         createCell(data,x) {
           x.save();
           x.beginPath();
-          
+  
           x.rect(data.xpos, data.ypos, data.width, data.height);
           x.clip()
           x.strokeStyle =data.color;
@@ -239,6 +255,7 @@ class Excel {
     }
 
         keyMove(e,canvas,x5,y5){
+            
           this.clearHighCell(this.activeCell,this.ctx)
           this.createCell(this.activeCell,this.ctx)
           let{rows,cols}=this.activeCell
@@ -324,6 +341,16 @@ class Excel {
 
           this.cell_initial=this.arr2d[y5][x5-1]
 
+          for(var i=this.min_r;i<=this.max_r;i++){
+            for(var j=this.min_c; j<=this.max_c; j++){
+                  this.final_cell=this.arr2d[i][j]
+                  
+                  this.clearHighCell(this.final_cell,this.ctx)
+                  this.createCell(this.final_cell,this.ctx)
+            }
+          }
+          
+
           var mousemove=(e)=> {
             let [x1,y1,sum]=this.showCoords(this.canvas,e);
             this.cell_final=this.arr2d[y1][x1-1]
@@ -337,31 +364,32 @@ class Excel {
             this.max_c=Math.max(c1,c2)
             this.min_c=Math.min(c1,c2)
             this.math_sum=0
-            this.arr_selected=[]
+            this.arr_select_temp=[]
+           
             for(var i=this.min_r;i<=this.max_r;i++){
                  for(var j=this.min_c; j<=this.max_c; j++){
                      this.final_cell=this.arr2d[i][j]
+                     this.arr_select_temp.push(this.final_cell)
                      this.math_sum+=parseInt(this.final_cell.data)||0;
-                     this.arr_selected.push(parseInt(this.final_cell.data)||0)
-                     this.createHighCell(this.final_cell,this.ctx)
+                     this.arr_selected.push(parseInt(this.final_cell.data)||0)  
                  }
-             } 
+            } 
+            
+            this.arr_diff=this.arr_selected.filter(c => this.arr_select_temp.indexOf(c)===-1)
+            this.arr_diff.forEach(c=>this.clearHighCell(c,this.ctx))
+            this.arr_diff.forEach(c=>this.createCell(c,this.ctx))
+
+            this.arr_selected=this.arr_select_temp
+            this.highlightCells(this.cell_initial,this.cell_final)
+
           };
 
           var mouseup=(e)=> {
-            for(var i=this.min_r;i<=this.max_r;i++){
-              for(var j=this.min_c; j<=this.max_c; j++){
-                  this.final_cell=this.arr2d[i][j]
-                  
-                  this.clearHighCell(this.final_cell,this.ctx)
-                  this.createCell(this.final_cell,this.ctx)
-              }
-            }
-           
+        
             canvas.removeEventListener("mousemove",mousemove)
             canvas.removeEventListener("mousedown",this.mousedown)
-            console.log("MAX = "+Math.max(...this.arr_selected))
-            console.log("MIN = "+Math.min(...this.arr_selected))
+            console.log("MAX = "+Math.max(...this.arr_selected.map(c => c.data)))
+            console.log("MIN = "+Math.min(...this.arr_selected.map(c => c.data)))
             console.log("SUM = "+this.math_sum)
             canvas.removeEventListener("mouseup",mouseup)
           }
@@ -369,12 +397,15 @@ class Excel {
           canvas.addEventListener("mouseup",mouseup)
     }
 
-        resize_mousedown(e,header) {
+      resize_mousedown(e,header) {
+          this.arr_selected=[]
+          
             let addition=0;
             this.textbox.style.display="none";
             let[x7,y1,total]=this.showCoords(this.header,e)
             this.prev_width=this.arr_width[x7-2];
 
+            
             var resize_mousemove=(e)=> {
                 let rect= header.getBoundingClientRect();
                 let x2 = e.clientX - rect.left -100;
@@ -399,6 +430,90 @@ class Excel {
       header.addEventListener('mousemove',resize_mousemove)
       header.addEventListener('mouseup',resize_mouseup)
     } 
+
+      extendData(count,axis) {
+      if (axis == 1) {
+          this.arr2d.forEach((row, i) => {
+            let prevColumns = row.length
+             
+              for (let j = prevColumns; j < prevColumns + count; j++) {
+                let left = row[row.length - 1].xpos + row[row.length - 1].width
+                let top = row[row.length - 1].ypos
+               
+                let rectData = {};
+                rectData["xpos"] = left;
+                rectData["ypos"] = top;
+                rectData["width"] = 100;
+                rectData["height"] =30;
+                rectData["color"] = "#9A9A9AFF";
+                rectData["data"] ="";
+                rectData["lineWidth"] = 1;
+                rectData["rows"] = i;
+                rectData["cols"] = j;
+                row.push(rectData);
+                this.createCell(rectData,this.ctx);
+              }
+          })
+            
+          console.log(this.arr2d)
+          this.drawHeader()
+            
+      }
+      
+      else {
+          // TODO: Extend data
+          // this.data.forEach((row, i) => {
+          //     let left = row[row.length - 1].left + row[row.length - 1].width
+          //     let top = row[row.length - 1].top
+          //     let height = this.cellheight
+          //     let width = this.cellwidth
+          //     let prevColumns = row.length
+          //     for (let j = prevColumns; j < prevColumns + count; j++) {
+          //         let cell: Cell = {
+          //             data: "",
+          //             top: top,
+          //             left: left,
+          //             height: height,
+          //             width: width,
+          //             row: i,
+          //             col: j,
+          //             isbold: false,
+          //             strokeStyle: "#959595",
+          //             lineWidth: 1,
+          //             fontSize: 16,
+          //             font: "Arial"
+          //         }
+          //         row.push(cell)
+          //         this.drawCell(cell)
+          //     }
+          // })
+      }
+    } 
+
+    highlightCells(cell_initial,cell_final) {
+
+      this.arr_selected.forEach(c => {this.clearHighCell(c,this.ctx);
+        this.createCell(c,this.ctx);
+      })
+
+      let context = this.ctx
+      context.strokeStyle ="green"
+      context.lineWidth = 4
+      context.beginPath()
+     
+      let leftX1 = Math.min(cell_initial.xpos,cell_final.xpos, cell_initial.xpos+ cell_initial.width,cell_final.xpos +cell_final.width)
+      let leftX2 = Math.max(cell_initial.xpos,cell_final.xpos, cell_initial.xpos+ cell_initial.width,cell_final.xpos +cell_final.width)
+      let topX1 = Math.min(cell_initial.ypos,cell_final.ypos +cell_final.height, cell_initial.ypos + cell_initial.height,cell_final.ypos)
+      let topX2 = Math.max(cell_initial.ypos,cell_final.ypos +cell_final.height, cell_initial.ypos + cell_initial.height,cell_final.ypos)
+
+      context.moveTo(leftX1, topX1)
+      context.lineTo(leftX2, topX1)
+      context.lineTo(leftX2, topX2)
+      context.lineTo(leftX1, topX2)
+      context.lineTo(leftX1, topX1)
+      context.stroke()
+  }
+  
 }
     csv = `Sr. No.,First Name,Last Name,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age
       1,Roy,Mas,21,156,Male,291,426,Male,561,696,Male,831,966,Male,1101,1236,Male,1371,1506,Male,1641
