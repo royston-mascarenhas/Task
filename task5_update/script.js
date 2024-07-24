@@ -12,7 +12,6 @@ class Excel {
     this.drawHeader();
     this.drawSidebar();
     this.activeCell;
-    
     this.val = false;
     this.max_c = 0;
     this.min_c = 0;
@@ -89,22 +88,12 @@ class Excel {
 
   scroller(event) {
     let {deltaX, deltaY } = event;
-    
     if (this.xscroll) {
-      
- 
       this.scrollX = Math.max(0, this.scrollX + deltaY);
-      
     } else {
-      
-      
       this.scrollY =Math.max(0, this.scrollY + (deltaY < 0 ? -30 : 30));
-      
     }
-
     this.drawOptimized();
-    
-
   }
 
   Xscroll(event) {
@@ -114,6 +103,7 @@ class Excel {
       this.xscroll = false;
     }
   }
+
   resize(e, header) {
     let rect = header.getBoundingClientRect();
     let x = e.clientX - rect.left - 100;
@@ -188,10 +178,10 @@ class Excel {
     x.beginPath();
 
     x.rect(
-      data.xpos - this.scrollX,
-      data.ypos - this.scrollY,
-      data.width,
-      data.height
+      data.xpos - this.scrollX-0.5,
+      data.ypos - this.scrollY-0.5,
+      data.width+1,
+      data.height+1
     );
     x.clip();
     x.strokeStyle = data.color;
@@ -225,8 +215,6 @@ class Excel {
   }
 
   createHighCell(data, x) {
-    
-    
     x.beginPath();
     x.rect(
       data.xpos - this.scrollX,
@@ -398,8 +386,13 @@ class Excel {
       this.textbox_visible(this.activeCell)
     }
     if (e.which == 37) {
+      if(this.activeCell.xpos - this.activeCell.width < this.scrollX)
+        {
+          this.scrollX=Math.max(0,this.scrollX-100)
+          this.drawOptimized()
+        }
       this.textbox.style.display = "none";
-      if (cols == 0) {
+      if (cols <= 1) {
         this.activeCell = this.arr2d[rows][cols];
         this.textbox_visible(this.activeCell);
         this.textbox.style.display = "none";
@@ -409,10 +402,20 @@ class Excel {
         this.createHighCell(this.activeCell, this.ctx);
       }
     } else if (e.which == 39) {
+      if(this.activeCell.xpos+200>this.scrollX+this.canvas.width)
+      {
+        this.scrollX+=100
+        this.drawOptimized()
+      }
       this.textbox.style.display = "none";
       this.activeCell = this.arr2d[rows][cols + 1];
       this.createHighCell(this.activeCell, this.ctx);
     } else if (e.which == 38) {
+      if(this.activeCell.ypos - this.activeCell.height < this.scrollY)
+        {
+          this.scrollY=Math.max(0,this.scrollY-30)
+          this.drawOptimized()
+        }
       this.textbox.style.display = "none";
       if (rows <= 0) {
         this.activeCell = this.arr2d[rows][cols];
@@ -422,6 +425,12 @@ class Excel {
         this.createHighCell(this.activeCell, this.ctx);
       }
     } else if (e.which == 40) {
+
+      if(this.activeCell.ypos+30>this.scrollX+this.canvas.height)
+        {
+          this.scrollY+=30
+          this.drawOptimized()
+        }
       this.textbox.style.display = "none";
       this.activeCell = this.arr2d[rows + 1][cols];
       this.createHighCell(this.activeCell, this.ctx);
@@ -463,7 +472,6 @@ class Excel {
 
   double_click(e, canvas) {
     let [x5, y5, sum] = this.showCoords(this.canvas, e);
-   
     this.cell = this.arr2d[y5][x5 - 1];
     this.textbox_visible(this.cell);
   }
@@ -473,11 +481,9 @@ class Excel {
     this.textbox.style.width = `${cell.width}px`;
     this.textbox.style.left = `${cell.xpos + 100 - this.scrollX}px`;
     this.textbox.style.top = `${cell.ypos - this.scrollY}px`;
-   
     this.textbox.style.height = `${cell.height}px`;
     this.textbox.style.boxSizing = "border-box";
     this.textbox.style.zIndex = "1";
-
     this.textbox.value = cell.data;
     this.textbox.focus();
   }
@@ -521,7 +527,6 @@ class Excel {
     for (var i = this.min_r; i <= this.max_r; i++) {
       for (var j = this.min_c; j <= this.max_c; j++) {
         this.final_cell = this.arr2d[i][j];
-
         this.clearHighCell(this.final_cell, this.ctx);
         this.createCell(this.final_cell, this.ctx);
       }
@@ -582,12 +587,10 @@ class Excel {
 
   resize_mousedown(e, header) {
     this.arr_selected = [];
-
     let addition = 0;
     this.textbox.style.display = "none";
     let [x7, y1, total] = this.showCoords(this.header, e);
     this.prev_width = this.arr_width[x7 - 2];
-
     var resize_mousemove = (e) => {
       let rect = header.getBoundingClientRect();
       let x2 = e.clientX - rect.left - 100;
@@ -622,7 +625,6 @@ class Excel {
         for (let j = prevColumns; j < prevColumns + count; j++) {
           let left = row[row.length - 1].xpos + row[row.length - 1].width;
           let top = row[row.length - 1].ypos;
-
           let rectData = {};
           rectData["xpos"] = left;
           rectData["ypos"] = top;
@@ -646,9 +648,7 @@ class Excel {
       let prevRows = this.arr2d.length;
       for (let i = prevRows; i < prevRows + count; i++) {
         let row = this.arr2d[i - 1];
-       
         let extend1d = [];
-
         for (let j = 0; j < row.length; j++) {
           let left = row[j].xpos;
           let top = row[j].ypos + row[j].height;
@@ -718,7 +718,6 @@ class Excel {
     context.lineTo(leftX1, topX1);
     context.stroke();
     context.setTransform(1,0,0,1,0,0)
-
   }
 }    
 csv = `Sr. No.,First Name,Last Name,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age
