@@ -216,7 +216,6 @@ class Excel {
     for (let i = 0; i < this.arr_width.length; i++) {
       const edge = this.arr_width[i];
       if (sum + 4 > x && x > sum) {
-        console.log(edge)
         header.style.cursor = "col-resize";
         this.header.addEventListener("mousedown", (e) =>
           this.resize_mousedown(e, this.header)
@@ -280,11 +279,13 @@ class Excel {
       } else {
         this.arr_width[x7 - 2] = this.prev_width + addition;
       }
+
+      this.widthAdj()
+      this.drawOptimized()
       
     };
     var resize_mouseup = (e) => {
-      this.widthAdj()
-      this.drawOptimized()
+     
       header.removeEventListener("mousemove", resize_mousemove);
       header.removeEventListener("mouseup", resize_mouseup);
     };
@@ -336,10 +337,10 @@ class Excel {
     x.beginPath();
 
     x.rect(
-      data.xpos - this.scrollX-0.5,
-      data.ypos - this.scrollY-0.5,
-      data.width+1,
-      data.height+1
+      data.xpos - this.scrollX,
+      data.ypos - this.scrollY,
+      data.width,
+      data.height
     );
     x.clip();
     x.strokeStyle = data.color;
@@ -417,6 +418,9 @@ class Excel {
   }
 
   click(e, canvas) {
+    if(this.arr_selected.length>1){
+      return
+    }
     let n = (e) => this.keyMove(e, this.canvas, x5, y5);
     this.textbox.style.display = "none";
     this.clearHighCell(this.activeCell, this.ctx);
@@ -442,7 +446,7 @@ class Excel {
   textbox_visible(cell) {
     this.textbox.style.display = "block";
     this.textbox.style.width = `${cell.width}px`;
-    this.textbox.style.left = `${cell.xpos + 100 - this.scrollX}px`;
+    this.textbox.style.left = `${cell.xpos + 60 - this.scrollX}px`;
     this.textbox.style.top = `${cell.ypos - this.scrollY}px`;
     this.textbox.style.height = `${cell.height}px`;
     this.textbox.style.boxSizing = "border-box";
@@ -587,6 +591,7 @@ class Excel {
     this.createCell(this.activeCell, this.ctx);
     let [x5, y5, sum] = this.showCoords(this.canvas, e);
     this.cell_initial = this.arr2d[y5][x5 - 1];
+   
     for (var i = this.min_r; i <= this.max_r; i++) {
       for (var j = this.min_c; j <= this.max_c; j++) {
         this.final_cell = this.arr2d[i][j];
@@ -636,6 +641,8 @@ class Excel {
     };
 
     var mouseup = (e) => {
+      this.activeCell=this.cell_initial
+      this.createHighCell(this.activeCell,this.ctx)
       canvas.removeEventListener("mousemove", mousemove);
       canvas.removeEventListener("mousedown", this.mousedown);
       console.log("MAX = " + Math.max(...this.arr_selected.map((c) => c.data)));
@@ -711,6 +718,7 @@ class Excel {
   }
 
   scroller(event) {
+    this.createHighCell(this.activeCell,this.ctx)
     let {deltaX, deltaY } = event;
     if (this.xscroll) {
       this.scrollX = Math.max(0, this.scrollX + deltaY);
@@ -789,13 +797,11 @@ class Excel {
       rectData["data"] =this.toLetters(j);
       rectData["lineWidth"] = 1;
       row.push(rectData);
-      console.log(row)
     }
   }
 
   extendSidebar(count){
     let row=this.header1dside
-    console.log(row)
     let prevColumns = row.length;
         for (let j = prevColumns; j < prevColumns+count; j++) {
           let left = 0;
@@ -842,7 +848,6 @@ class Excel {
       else {
         let initWidth = 0;
         initHeight += row[0].height;
-        console.log(this.header1dside[i])
         this.createCell(this.header1dside[i],this.stx)
         for (let j = 0; j < row.length; j++) {
           if (j === row.length - 2) {
