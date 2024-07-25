@@ -95,7 +95,7 @@ class Excel {
     this.textbox.style.display = "none";
 
     let header = document.createElement("canvas");
-    header.width = this.container.offsetWidth-100;
+    header.width = this.container.offsetWidth-90;
     header.height = 30;
     this.container.appendChild(header);
     this.header = header;
@@ -114,7 +114,7 @@ class Excel {
     this.textbox.style.position = "absolute";
 
     let canvas = document.createElement("canvas");
-    canvas.width = this.container.offsetWidth - 100;
+    canvas.width = this.container.offsetWidth - 90;
     canvas.height = this.container.offsetHeight - 30;
     canvas.id = "canvas";
 
@@ -158,15 +158,16 @@ class Excel {
   }
 
   resize_event(){
-    canvas.width = this.container.offsetWidth - 100-1;
-    canvas.height = this.container.offsetHeight - 30;
-    this.header.width = this.container.offsetWidth-100;
+    canvas.width = this.container.offsetWidth-60;
+    canvas.height = this.container.offsetHeight-30;
+    this.header.width = this.container.offsetWidth-60;
     this.header.height = 30;
     this.sidebar.width = 60;
     this.sidebar.height = this.container.offsetHeight - 30;
-    this.drawOptimized()
     this.drawHeader()
     this.drawSidebar()
+    this.drawOptimized()
+    
   }
 
   drawHeader() {
@@ -174,9 +175,6 @@ class Excel {
     let arr = chars.split("");
     this.header1dhead = [];
     let counter = 0;
-
-    
-
     for (let j = 0; j < this.arr_width.length; j++) {
       let rectDatahead = {};
       rectDatahead["xpos"] = counter;
@@ -188,8 +186,7 @@ class Excel {
       rectDatahead["lineWidth"] = 1;
       this.header1dhead.push(rectDatahead);
       counter += this.arr_width[j];
-    }
-    
+    }  
   }
 
   drawSidebar() {
@@ -213,21 +210,22 @@ class Excel {
 
   resize(e, header) {
     let rect = header.getBoundingClientRect();
-    let x = e.clientX - rect.left;
+    let x = e.clientX - rect.left+this.scrollX;
     let sum = 0;
 
     for (let i = 0; i < this.arr_width.length; i++) {
       const edge = this.arr_width[i];
       if (sum + 4 > x && x > sum) {
+        console.log(edge)
         header.style.cursor = "col-resize";
         this.header.addEventListener("mousedown", (e) =>
           this.resize_mousedown(e, this.header)
         );
         break;
       } else {
-        this.header.addEventListener("mousedown", (e) =>
-          this.select_col(e, this.header)
-        );
+        // this.header.addEventListener("mousedown", (e) =>
+        //   this.select_col(e, this.header)
+        // );
         header.style.cursor = "default";
       }
       sum += edge;
@@ -272,7 +270,7 @@ class Excel {
     this.prev_width = this.arr_width[x7 - 2];
     var resize_mousemove = (e) => {
       let rect = header.getBoundingClientRect();
-      let x2 = e.clientX - rect.left;
+      let x2 = e.clientX - rect.left+this.scrollX; 
       addition = x2 - total;
 
       this.arr_width[x7 - 2] = this.prev_width + addition;
@@ -282,16 +280,44 @@ class Excel {
       } else {
         this.arr_width[x7 - 2] = this.prev_width + addition;
       }
-      this.drawHeader()
-      this.csvToExcel();
-      this.drawOptimized()
+      
     };
     var resize_mouseup = (e) => {
+      this.widthAdj()
+      this.drawOptimized()
       header.removeEventListener("mousemove", resize_mousemove);
       header.removeEventListener("mouseup", resize_mouseup);
     };
     header.addEventListener("mousemove", resize_mousemove);
     header.addEventListener("mouseup", resize_mouseup);
+  }
+
+  widthAdj(){
+    let counter = 0;
+    for (let j = 0; j < this.arr2d[0].length; j++) {
+      let rectData =this.arr2d[0][j];
+      rectData.xpos = counter;
+      rectData.width = this.arr_width[j];
+      counter += this.arr_width[j];
+    }
+
+    for (let i = 1; i < this.arr2d.length; i++) {
+      counter = 0;
+      for (let j = 0; j < this.arr2d[0].length; j++) {
+        let rectData =this.arr2d[i][j];
+        rectData.xpos = counter;
+        rectData.width = this.arr_width[j];
+        counter += this.arr_width[j];
+      }
+    }
+    counter=0
+    for (let j = 0; j < this.header1dhead.length; j++) {
+      let rectDatahead = this.header1dhead[j];
+      rectDatahead.xpos = counter;
+      rectDatahead.width = this.arr_width[j];
+      counter += this.arr_width[j];
+    }  
+    
   }
 
   createCell(data, x) {
@@ -722,7 +748,6 @@ class Excel {
     
     } 
     else {
-     
       let prevRows = this.arr2d.length;
       for (let i = prevRows; i < prevRows + count; i++) {
         let row = this.arr2d[i - 1];
@@ -781,7 +806,7 @@ class Excel {
           rectData["width"] = 100;
           rectData["height"] = 30;
           rectData["color"] = "#9A9A9AFF";
-          rectData["data"] = "";
+          rectData["data"] = j+1;
           rectData["lineWidth"] = 1;
           row.push(rectData);
     }
