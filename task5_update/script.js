@@ -25,9 +25,7 @@ class Excel {
     this.drawOptimized();
     this.xscroll = false;
     this.arr_selected = [];
-    // this.extendData(10,1)
     this.ele = 0;
-    // this.canvas.addEventListener("mousedown",(e)=>this.mousedown(e,this.canvas))
   }
 
   init() {
@@ -146,15 +144,10 @@ class Excel {
     this.sidebar.addEventListener("mousedown", (e) =>
       this.select_row(e, this.sidebar)
     );
-
-    // this.sidebar.addEventListener("mousemove", (e) =>
-    //   this.resize(e, this.header)
-    // );
     window.addEventListener("keydown", this.Xscroll.bind(this));
     window.addEventListener("keyup", this.Xscroll.bind(this));
     this.canvas.addEventListener("wheel", this.scroller.bind(this));
     window.addEventListener("resize",this.resize_event.bind(this))
-   
   }
 
   resize_event(){
@@ -167,7 +160,6 @@ class Excel {
     this.drawHeader()
     this.drawSidebar()
     this.drawOptimized()
-    
   }
 
   drawHeader() {
@@ -190,11 +182,7 @@ class Excel {
   }
 
   drawSidebar() {
-    // let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    // let arr = chars.split("")
     let arr = [...Array(this.arr2d.length)].map((_, i) => i + 1);
-    
-
     for (let j = 0; j < arr.length; j++) {
       let rectDatahead = {};
       rectDatahead["xpos"] = 0;
@@ -232,13 +220,11 @@ class Excel {
   }
   
   select_col(e){
-    
     // this.clearHighCell(this.cell1, this.ctx);
     // this.createCell(this.cell1, this.ctx);
 
     // this.clearHighCell(this.cell2, this.ctx);
     // this.createCell(this.cell2, this.ctx);
-   
     let[x,y,sum]=this.showCoords(this.header,e)
     this.cell1=this.arr2d[y][x-1]
     this.cell2=this.arr2d[y+10][x-1]
@@ -301,7 +287,6 @@ class Excel {
       rectData.width = this.arr_width[j];
       counter += this.arr_width[j];
     }
-
     for (let i = 1; i < this.arr2d.length; i++) {
       counter = 0;
       for (let j = 0; j < this.arr2d[0].length; j++) {
@@ -317,20 +302,19 @@ class Excel {
       rectDatahead.xpos = counter;
       rectDatahead.width = this.arr_width[j];
       counter += this.arr_width[j];
-    }  
-    
+    }
   }
 
   createCell(data, x) {
   switch (x) {
-                case this.stx:
-                    x.translate(this.scrollX, 0)
-                    break;
-                case this.htx:
-                    x.translate(0, this.scrollY)
-                    break;
-                default:
-                    break;
+    case this.stx:
+        x.translate(this.scrollX, 0)
+        break;
+    case this.htx:
+        x.translate(0, this.scrollY)
+        break;
+    default:
+        break;
             }
  
     x.save();
@@ -462,7 +446,7 @@ class Excel {
     this.createCell(this.cell, this.ctx);
   }
 
-  keyMove(e, canvas, x5, y5) {
+  keyMove(e, canvas, x5, y5) { 
     if(e.target==this.textbox){
       return
     }
@@ -645,8 +629,8 @@ class Excel {
       this.createHighCell(this.activeCell,this.ctx)
       canvas.removeEventListener("mousemove", mousemove);
       canvas.removeEventListener("mousedown", this.mousedown);
-      console.log("MAX = " + Math.max(...this.arr_selected.map((c) => c.data)));
-      console.log("MIN = " + Math.min(...this.arr_selected.map((c) => c.data)));
+      console.log("MAX = " + Math.max(...this.arr_selected.map((c) => parseInt(c.data) ? c.data : 0)));
+      console.log("MIN = " + Math.min(...this.arr_selected.map((c) => parseInt(c.data) ? c.data : Infinity)));
       console.log("SUM = " + this.math_sum);
       console.log("Number Of Selected Elements= " + this.ele);
       canvas.removeEventListener("mouseup", mouseup);
