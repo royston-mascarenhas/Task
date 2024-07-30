@@ -130,7 +130,7 @@ class Excel {
 
     this.container.appendChild(sidebar);
     this.container.appendChild(canvas);
-
+    this.container.style.fontSize="0px"
     // this.canvas.addEventListener("click", (e) => this.click(e, this.canvas));
     this.canvas.addEventListener("dblclick", (e) =>
       this.double_click(e, this.canvas)
@@ -208,7 +208,6 @@ class Excel {
     this.header1dhead.forEach( c=> {
       this.createCell(c,this.htx)
     });
-   
   }
   
   drawSide()
@@ -255,13 +254,10 @@ class Excel {
   }
 
   select_row(e){
-
     // this.clearHighCell(this.cell1, this.ctx);
     // this.createCell(this.cell1, this.ctx);
-
     // this.clearHighCell(this.cell2, this.ctx);
     // this.createCell(this.cell2, this.ctx);
-   
     let[x,y,sum]=this.showCoords(this.sidebar,e)
     this.cell1=this.arr2d[y][x-1]
     this.cell2=this.arr2d[y][x-1+1]
@@ -270,7 +266,6 @@ class Excel {
   }
 
   resize_mousedown(e, header) {
-    
     this.arr_selected = [];
     let addition = 0;
     this.textbox.style.display = "none";
@@ -288,18 +283,13 @@ class Excel {
       } else {
         this.arr_width[x7 - 2] = this.prev_width + addition;
       }
-
       this.widthAdj()
-      this.drawOptimized()
-      
+      this.drawOptimized() 
     };
-
     var mouseleave=(e)=>{
       this.header.removeEventListener("mousemove", resize_mousemove);
-
     };
     var resize_mouseup = (e) => {
-     
       header.removeEventListener("mousemove", resize_mousemove);
       header.removeEventListener("mouseup", resize_mouseup);
     };
@@ -372,33 +362,49 @@ class Excel {
   }
 
   createCellHeader(data, x) {
-    
+    x.save()
     x.beginPath();
+    x.moveTo(data.xpos-this.scrollX,30)
+    x.lineTo(data.xpos-this.scrollX+data.width,30); 
+     
+    x.lineTo(data.xpos-this.scrollX+data.width,0); 
+    x.lineTo(data.xpos-this.scrollX,0); 
+   
+    x.fillStyle="#03723C22"
+    x.fill() 
+
+    x.restore()
+    x.save()
+    x.beginPath()
+    x.strokeStyle = "green";
+    x.lineWidth = 4;
     x.moveTo(data.xpos-this.scrollX-2,30)
     x.lineTo(data.xpos-this.scrollX+data.width+2,30); 
-     
-    // x.moveTo(data.xpos-this.scrollX+data.width,data.ypos)
-    // x.lineTo(data.xpos,data.xpos-this.scrollX+data.width);  
-    x.strokeStyle = "green";
-    x.font = `${18}px areal`;
-    x.fillStyle = "black";
-    x.lineWidth = 8;
-    x.stroke();
+    x.stroke()
+    x.restore()
  
   }
 
   createCellSide(data, x) {
+    x.save()
     x.beginPath();
-    x.moveTo(data.xpos+60,data.ypos-this.scrollY-2)
+    x.moveTo(data.xpos+60,data.ypos-this.scrollY)
+    x.lineTo(data.xpos+60,data.ypos-this.scrollY+data.height);  
+    x.lineTo(data.xpos+0,data.ypos-this.scrollY+data.height);  
+    x.lineTo(data.xpos+0,data.ypos-this.scrollY);  
+  
 
-    x.lineTo(data.xpos+60,data.ypos-this.scrollY+data.height+2);  
-    // x.moveTo(data.xpos-this.scrollX+data.width,data.ypos)
-    // x.lineTo(data.xpos,data.xpos-this.scrollX+data.width);  
+    x.fillStyle="#03723C22"
+    x.fill() 
+    x.restore()
+    x.save()
+    x.beginPath()
     x.strokeStyle = "green";
-    x.font = `${18}px areal`;
-    x.fillStyle = "black";
-    x.lineWidth = 8;
+    x.lineWidth = 4;
+    x.moveTo(data.xpos+60,data.ypos-this.scrollY-2)
+    x.lineTo(data.xpos+60,data.ypos-this.scrollY+data.height+2);  
     x.stroke();
+    x.restore()
  
   }
 
@@ -698,9 +704,6 @@ class Excel {
       this.drawSide()
     });
     let context = this.ctx;
-   
-   
-    
     context.translate(-this.scrollX,-this.scrollY)
     let leftX1 = Math.min(
       cell_initial.xpos,
@@ -726,7 +729,6 @@ class Excel {
       cell_initial.ypos + cell_initial.height,
       cell_final.ypos
     );
-
     context.save()
     context.beginPath();
     context.moveTo(leftX1, topX1);
@@ -749,23 +751,44 @@ class Excel {
 
     this.htx.save()
     this.htx.beginPath();
+    
     this.htx.moveTo(leftX1-this.scrollX,30);
     this.htx.lineTo(leftX2-this.scrollX,30);
+    this.htx.lineTo(leftX2-this.scrollX,0);
+    this.htx.lineTo(leftX1-this.scrollX,0);
+    this.htx.lineTo(leftX1-this.scrollX,30);
    
     this.htx.fillStyle="#03723C22"
     this.htx.fill()
-    
+
+    this.htx.restore()
+    this.htx.save()
+    this.htx.beginPath()
+    this.htx.strokeStyle="green"
+    this.htx.lineWidth = 4;
+    this.htx.moveTo(leftX1-this.scrollX-2,30);
+    this.htx.lineTo(leftX2-this.scrollX+2,30);
     this.htx.stroke()
     this.htx.restore()
     
     this.stx.moveTo(60,topX1-this.scrollY);
     this.stx.lineTo(60,topX2-this.scrollY);
+    this.stx.lineTo(0,topX2-this.scrollY);
+    this.stx.lineTo(0,topX1-this.scrollY);
+    this.stx.lineTo(60,topX1-this.scrollY);
     
     this.stx.fillStyle="#03723C22"
     this.stx.fill()
 
-    
+    this.stx.restore()
+    this.stx.save()
+    this.stx.beginPath()
+    this.stx.strokeStyle = "green";
+    this.stx.lineWidth = 4;
+    this.stx.moveTo(60,topX1-this.scrollY);
+    this.stx.lineTo(60,topX2-this.scrollY);
     this.stx.stroke()
+    this.stx.restore()
     context.setTransform(1,0,0,1,0,0)
   }
 
@@ -783,6 +806,7 @@ class Excel {
   }
 
   scroller(event) {
+    this.textbox.style.display="none"
     this.createHighCell(this.activeCell,this.ctx)
     let {deltaX, deltaY } = event;
     if (this.xscroll) {
