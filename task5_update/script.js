@@ -12,6 +12,8 @@ class Excel {
     this.cell1
     this.cell2
     this.activeCell;
+    this.activeRow;
+    this.activeCol;
     this.val = false;
     this.max_c = 0;
     this.min_c = 0;
@@ -26,6 +28,7 @@ class Excel {
     this.xscroll = false;
     this.arr_selected = [];
     this.ele = 0;
+    this.counter=1
   }
 
   init() {
@@ -79,6 +82,7 @@ class Excel {
       this.arr2d.push(data1d);
     }
     this.activeCell = this.arr2d[0][0];
+  
   }
 
   createcanvas() {
@@ -127,7 +131,7 @@ class Excel {
     this.container.appendChild(sidebar);
     this.container.appendChild(canvas);
 
-    this.canvas.addEventListener("click", (e) => this.click(e, this.canvas));
+    // this.canvas.addEventListener("click", (e) => this.click(e, this.canvas));
     this.canvas.addEventListener("dblclick", (e) =>
       this.double_click(e, this.canvas)
     );
@@ -147,9 +151,10 @@ class Excel {
     window.addEventListener("keydown", this.Xscroll.bind(this));
     window.addEventListener("keyup", this.Xscroll.bind(this));
     this.canvas.addEventListener("wheel", this.scroller.bind(this));
+    // this.canvas.addEventListener("mouseleave",this.mouseleave.bind(this));
     window.addEventListener("resize",this.resize_event.bind(this))
   }
-
+ 
   resize_event(){
     canvas.width = this.container.offsetWidth-60;
     canvas.height = this.container.offsetHeight-30;
@@ -179,6 +184,8 @@ class Excel {
       this.header1dhead.push(rectDatahead);
       counter += this.arr_width[j];
     }  
+    this.activeRow = this.header1dhead[0];
+    this.activeCol = this.header1dside[0];
   }
 
   drawSidebar() {
@@ -194,6 +201,21 @@ class Excel {
       rectDatahead["lineWidth"] = 1;
       this.header1dside.push(rectDatahead);
     }
+  }
+
+  drawHead()
+  {
+    this.header1dhead.forEach( c=> {
+      this.createCell(c,this.htx)
+    });
+   
+  }
+  
+  drawSide()
+  {
+    this.header1dside.forEach( c=> {
+      this.createCell(c,this.stx)
+    });
   }
 
   resize(e, header) {
@@ -248,6 +270,7 @@ class Excel {
   }
 
   resize_mousedown(e, header) {
+    
     this.arr_selected = [];
     let addition = 0;
     this.textbox.style.display = "none";
@@ -270,6 +293,11 @@ class Excel {
       this.drawOptimized()
       
     };
+
+    var mouseleave=(e)=>{
+      this.header.removeEventListener("mousemove", resize_mousemove);
+
+    };
     var resize_mouseup = (e) => {
      
       header.removeEventListener("mousemove", resize_mousemove);
@@ -277,6 +305,7 @@ class Excel {
     };
     header.addEventListener("mousemove", resize_mousemove);
     header.addEventListener("mouseup", resize_mouseup);
+    header.addEventListener("mouseleave", mouseleave);
   }
 
   widthAdj(){
@@ -343,29 +372,34 @@ class Excel {
   }
 
   createCellHeader(data, x) {
-
-    x.save();
+    
     x.beginPath();
-
-    x.rect(
-      data.xpos- this.scrollX, 
-      data.ypos- this.scrollY, 
-      data.width, 
-      data.height);
-
-    x.clip();
-    x.strokeStyle = data.color;
+    x.moveTo(data.xpos-this.scrollX-2,30)
+    x.lineTo(data.xpos-this.scrollX+data.width+2,30); 
+     
+    // x.moveTo(data.xpos-this.scrollX+data.width,data.ypos)
+    // x.lineTo(data.xpos,data.xpos-this.scrollX+data.width);  
+    x.strokeStyle = "green";
     x.font = `${18}px areal`;
     x.fillStyle = "black";
-    x.lineWidth = data.lineWidth;
-
-    x.fillText(
-      data.data,
-      data.xpos + 10-this.scrollX, 
-      data.ypos + data.height - 5-this.scrollY);
-
+    x.lineWidth = 8;
     x.stroke();
-    x.restore();
+ 
+  }
+
+  createCellSide(data, x) {
+    x.beginPath();
+    x.moveTo(data.xpos+60,data.ypos-this.scrollY-2)
+
+    x.lineTo(data.xpos+60,data.ypos-this.scrollY+data.height+2);  
+    // x.moveTo(data.xpos-this.scrollX+data.width,data.ypos)
+    // x.lineTo(data.xpos,data.xpos-this.scrollX+data.width);  
+    x.strokeStyle = "green";
+    x.font = `${18}px areal`;
+    x.fillStyle = "black";
+    x.lineWidth = 8;
+    x.stroke();
+ 
   }
 
   createHighCell(data, x) {
@@ -401,26 +435,6 @@ class Excel {
     );
   }
 
-  click(e, canvas) {
-    if(this.arr_selected.length>1){
-      return
-    }
-    let n = (e) => this.keyMove(e, this.canvas, x5, y5);
-    this.textbox.style.display = "none";
-    this.clearHighCell(this.activeCell, this.ctx);
-    this.createCell(this.activeCell, this.ctx);
-    let [x5, y5, sum] = this.showCoords(this.canvas, e);
-    this.cell = this.arr2d[y5][x5 - 1];
-    this.activeCell = this.cell;
-    this.createHighCell(this.activeCell, this.ctx);
-
-    // canvas.addEventListener("mousemove",(e)=>this.mousemove(e,canvas,this.cell))
-    if (!this.val) {
-      window.addEventListener("keydown", n);
-      this.val = true;
-    }
-  }
-
   double_click(e, canvas) {
     let [x5, y5, sum] = this.showCoords(this.canvas, e);
     this.cell = this.arr2d[y5][x5 - 1];
@@ -440,10 +454,12 @@ class Excel {
   }
 
   textset(event, canvas) {
+    
     var t1 = event.target.value;
     this.cell.data = t1;
     this.clearCell(this.cell, this.ctx);
     this.createCell(this.cell, this.ctx);
+    
   }
 
   keyMove(e, canvas, x5, y5) { 
@@ -460,7 +476,6 @@ class Excel {
     let {rows,cols} = this.activeCell;
 
     if(e.key.match(/^\w$/)){
-      
       this.textbox_visible(this.activeCell)
     }
     if (e.which == 37) {
@@ -477,6 +492,7 @@ class Excel {
         this.createHighCell(this.activeCell, this.ctx);
       } else {
         this.activeCell = this.arr2d[rows][cols - 1];
+        cols--;
         this.createHighCell(this.activeCell, this.ctx);
       }
     } else if (e.which == 39) {
@@ -491,11 +507,11 @@ class Excel {
     } else if (e.which == 38) {
       if(this.activeCell.ypos - this.activeCell.height < this.scrollY)
         {
-          this.scrollY=Math.max(0,this.scrollY-30)
+          this.scrollY=Math.min(0,this.scrollY-30)
           this.drawOptimized()
         }
       this.textbox.style.display = "none";
-      if (rows <= 0) {
+      if (rows <= 1) {
         this.activeCell = this.arr2d[rows][cols];
         this.createHighCell(this.activeCell, this.ctx);
       } else {
@@ -504,7 +520,7 @@ class Excel {
       }
     } else if (e.which == 40) {
 
-      if(this.activeCell.ypos+30>this.scrollX+this.canvas.height)
+      if(this.activeCell.ypos+30>this.scrollY+this.canvas.height)
         {
           this.scrollY+=30
           this.drawOptimized()
@@ -552,10 +568,8 @@ class Excel {
     let rect = this.canvas.getBoundingClientRect();
     let x = Math.max(0, event.clientX - rect.left + this.scrollX);
     let y = Math.max(0, event.clientY - rect.top + this.scrollY);
-
     var sum = 0;
     var rows = 0;
-
     for (var i = 0; i < this.arr_width.length; i++) {
       if (x > sum) {
         rows++;
@@ -564,18 +578,47 @@ class Excel {
       }
       sum += this.arr_width[i];
     }
-
     let y1 = Math.floor(y / 30);
     return [rows, y1, sum - this.arr_width[rows - 1]];
   }
 
   mousedown(e, canvas) {
+
+    this.htx.clearRect(0, 0, this.header.width, this.header.height);
+    this.stx.clearRect(0, 0, this.sidebar.width, this.sidebar.height);
+    this.drawHead()
+    this.drawSide()
+
+    let n = (e) => this.keyMove(e, this.canvas, x5, y5);
+    this.textbox.style.display = "none";
+  
+    if(this.counter> 1){
+      this.clearHighCell(this.activeCell, this.ctx);
+      this.clearHighCell(this.activeRow, this.htx);
+      this.clearHighCell(this.activeCol, this.stx);
+     
+      this.createCell(this.activeCell, this.ctx);
+      this.createCell(this.activeRow, this.htx);
+      this.createCell(this.activeCol, this.stx);
+    }
+    this.counter++;
+    let [x1, y1, sum1] = this.showCoords(this.canvas, e);
+    this.activeRow=this.header1dhead[x1-1]
+    this.activeCol=this.header1dside[y1]
+    console.log(this.activeRow)
+    console.log(this.activeCol)
+    this.activeCell = this.arr2d[y1][x1 - 1];
+    this.createHighCell(this.activeCell, this.ctx);
+    this.createCellHeader(this.activeRow, this.htx);
+    this.createCellSide(this.activeCol, this.stx);
+    // canvas.addEventListener("mousemove",(e)=>this.mousemove(e,canvas,this.cell))
+    if (!this.val) {
+      window.addEventListener("keydown", n);
+      this.val = true;
+    }
     this.arr_selected = [];
-    this.clearHighCell(this.activeCell, this.ctx);
-    this.createCell(this.activeCell, this.ctx);
     let [x5, y5, sum] = this.showCoords(this.canvas, e);
     this.cell_initial = this.arr2d[y5][x5 - 1];
-   
     for (var i = this.min_r; i <= this.max_r; i++) {
       for (var j = this.min_c; j <= this.max_c; j++) {
         this.final_cell = this.arr2d[i][j];
@@ -587,7 +630,6 @@ class Excel {
     var mousemove = (e) => {
       let [x1, y1, sum] = this.showCoords(this.canvas, e);
       this.cell_final = this.arr2d[y1][x1 - 1];
-
       let r1 = this.cell_initial.rows;
       let r2 = this.cell_final.rows;
       let c1 = this.cell_initial.cols;
@@ -599,7 +641,6 @@ class Excel {
       this.math_sum = 0;
       this.arr_select_temp = [];
       this.ele = 0;
-
       for (var i = this.min_r; i <= this.max_r; i++) {
         for (var j = this.min_c; j <= this.max_c; j++) {
           this.final_cell = this.arr2d[i][j];
@@ -608,13 +649,11 @@ class Excel {
           this.arr_selected.push(parseInt(this.final_cell.data) || 0);
         }
       }
-
       this.arr_diff = this.arr_selected.filter(
         (c) => this.arr_select_temp.indexOf(c) === -1
       );
       this.arr_diff.forEach((c) => this.clearHighCell(c, this.ctx));
       this.arr_diff.forEach((c) => this.createCell(c, this.ctx));
-
       this.arr_selected = this.arr_select_temp;
     
 
@@ -624,7 +663,11 @@ class Excel {
       this.highlightCells(this.cell_initial, this.cell_final);
     };
 
+   
+
     var mouseup = (e) => {
+      this.cell=this.activeCell
+
       this.activeCell=this.cell_initial
       this.createHighCell(this.activeCell,this.ctx)
       canvas.removeEventListener("mousemove", mousemove);
@@ -635,25 +678,30 @@ class Excel {
       console.log("Number Of Selected Elements= " + this.ele);
       canvas.removeEventListener("mouseup", mouseup);
     };
+
+    var mouseleave=(e)=>{
+      this.canvas.removeEventListener("mousemove", mousemove);
+      
+    };
     canvas.addEventListener("mousemove", mousemove);
     canvas.addEventListener("mouseup", mouseup);
+    canvas.addEventListener("mouseleave", mouseleave);
   }
 
   highlightCells(cell_initial, cell_final) {
     this.arr_selected.forEach((c) => {
       this.clearHighCell(c, this.ctx);
       this.createCell(c, this.ctx);
+      this.htx.clearRect(0, 0, this.header.width, this.header.height);
+      this.stx.clearRect(0, 0, this.sidebar.width, this.sidebar.height);
+      this.drawHead()
+      this.drawSide()
     });
-
     let context = this.ctx;
-    context.strokeStyle = "green";
-    context.lineWidth = 4;
-    context.fillStyle = "red";
-    context.beginPath();
+   
+   
     
-
     context.translate(-this.scrollX,-this.scrollY)
-
     let leftX1 = Math.min(
       cell_initial.xpos,
       cell_final.xpos,
@@ -679,12 +727,45 @@ class Excel {
       cell_final.ypos
     );
 
+    context.save()
+    context.beginPath();
     context.moveTo(leftX1, topX1);
     context.lineTo(leftX2, topX1);
     context.lineTo(leftX2, topX2);
     context.lineTo(leftX1, topX2);
     context.lineTo(leftX1, topX1);
-    context.stroke();
+
+    if(this.arr_selected.length>1){
+      context.fillStyle="#03723C22"
+      context.fill()
+    }
+    context.strokeStyle = "#03723C";
+    context.lineWidth = 3;
+    context.stroke()
+    context.restore()
+
+    this.clearCell(this.cell_initial,this.ctx)
+    this.createCell(this.cell_initial,this.ctx)
+
+    this.htx.save()
+    this.htx.beginPath();
+    this.htx.moveTo(leftX1-this.scrollX,30);
+    this.htx.lineTo(leftX2-this.scrollX,30);
+   
+    this.htx.fillStyle="#03723C22"
+    this.htx.fill()
+    
+    this.htx.stroke()
+    this.htx.restore()
+    
+    this.stx.moveTo(60,topX1-this.scrollY);
+    this.stx.lineTo(60,topX2-this.scrollY);
+    
+    this.stx.fillStyle="#03723C22"
+    this.stx.fill()
+
+    
+    this.stx.stroke()
     context.setTransform(1,0,0,1,0,0)
   }
 
@@ -716,7 +797,6 @@ class Excel {
     if (axis === 1) {
       this.arr2d.forEach((row, i) => {
         let prevColumns = row.length;
-
         for (let j = prevColumns; j < prevColumns + count; j++) {
           let left = row[row.length - 1].xpos + row[row.length - 1].width;
           let top = row[row.length - 1].ypos;
@@ -734,10 +814,8 @@ class Excel {
           row.push(rectData);
           this.createCell(rectData, this.ctx);
         }
-        
       });
       this.extendHeader(count)
-    
     } 
     else {
       let prevRows = this.arr2d.length;
@@ -767,7 +845,7 @@ class Excel {
   }
 
   extendHeader(count){
-    let row=this.header1dhead
+    let row=this.header1dhead  
     let prevColumns = row.length;
     for (let j = prevColumns; j < prevColumns + count; j++) {
       let left = row[row.length - 1].xpos + row[row.length - 1].width;
@@ -813,19 +891,16 @@ class Excel {
     this.htx.clearRect(0, 0, this.header.width, this.header.height);
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.stx.clearRect(0, 0, this.sidebar.width, this.sidebar.height);
-
     let canvaWidth = this.canvas.offsetWidth;
     let canvaHeight = this.canvas.offsetHeight;
     let initHeight = 0;
     let newScrollY = this.scrollY;
     let newScrollX = this.scrollX;
-    for (let i = newScrollY / 30; i < this.arr2d.length; i++) {
-      
+    for (let i = newScrollY / 30; i < this.arr2d.length; i++) {  
       const row = this.arr2d[i];
       if (i === this.arr2d.length - 1) {
         this.extendData(10, 2);
       }
-
       if (initHeight > canvaHeight + newScrollY) {
         break;
       } 
