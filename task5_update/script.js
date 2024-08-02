@@ -1,10 +1,9 @@
 class Excel {
   arr_width = [
-    100, 200, 100, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
+    100, 250, 100, 233, 100, 100, 100, 100, 100, 100, 100, 100, 140, 100, 100, 100, 100, 100, 100, 100, 100, 100,
   ];
 
   constructor(csv, container) {
-    
     this.header1dside = [];
     this.csv = csv;
     this.lineDashOffset=0;
@@ -44,7 +43,6 @@ class Excel {
   render(){
     if(this.busy)
       return
-    console.log("1111")
     this.busy=requestAnimationFrame(()=>{
       this.busy=null
       this.drawOptimized()
@@ -62,7 +60,6 @@ class Excel {
     this.scrollX+=(this.dx-this.scrollX)*0.1
     this.scrollY+=(this.dy-this.scrollY)*0.1
     if(Math.round(this.scrollX)!=this.dx || Math.round(this.scrollY)!=this.dy){
-      
       this.render()
     }
   }
@@ -127,33 +124,35 @@ class Excel {
     this.rightclick = document.createElement("div")
     this.rightclick.style.cursor="pointer"
     this.rightclick.style.borderRadius="10px"
-
+    this.rightclick.style.fontFamily="Segoe UI"
+    this.rightclick.style.fontSize="14px"
+    
     this.rightclick_1 = document.createElement("div")
     this.rightclick_2= document.createElement("div")
     this.rightclick_3 = document.createElement("div")
     this.rightclick_4 = document.createElement("div")
+    this.rightclick_5 = document.createElement("div")
 
-    this.rightclick.style.fontSize="large"
+   
     this.rightclick.style.textAlign="left"
     this.rightclick.style.padding="10px"
     this.rightclick.style.border="solid 1px black"
     
-
-
-    this.rightclick_1.style.height="50px"
+    this.rightclick_1.style.height="40px"
     this.rightclick_1.textContent="CUT"
     
 
-    this.rightclick_2.style.height="50px"
+    this.rightclick_2.style.height="40px"
     this.rightclick_2.textContent="COPY"
 
-    this.rightclick_3.style.height="50px"
+    this.rightclick_3.style.height="40px"
     this.rightclick_3.textContent="PASTE"
 
-    this.rightclick_4.style.height="20px"
+    this.rightclick_4.style.height="40px"
     this.rightclick_4.textContent="DELETE"
 
-
+    this.rightclick_5.style.height="40px"
+    this.rightclick_5.textContent="SORT"
     
     let infiX_parent = document.createElement("div")
     this.infiX_parent=infiX_parent
@@ -169,6 +168,8 @@ class Excel {
     this.container.appendChild(emptyBox)
     this.textbox = document.createElement("input");
     this.textbox.style.display = "none";
+    this.textbox.style.border="2px solid green"
+    this.textbox.style.boxSizing="border-box"
 
     let header = document.createElement("canvas");
     header.width = this.container.offsetWidth-60;
@@ -236,12 +237,16 @@ class Excel {
     this.rightclick.appendChild(this.rightclick_2)
     this.rightclick.appendChild(this.rightclick_3)
     this.rightclick.appendChild(this.rightclick_4)
+    this.rightclick.appendChild(this.rightclick_5)
 
     
     this.container.style.fontSize="0px"
     // this.canvas.addEventListener("click", (e) => this.click(e, this.canvas));
     this.canvas.addEventListener("dblclick", (e) =>
       this.double_click(e, this.canvas)
+    );
+    this.canvas.addEventListener("contextmenu",(e) => 
+      this.right_click(e, this.canvas)
     );
     this.canvas.addEventListener("mousedown", (e) =>
       this.mousedown(e, this.canvas)
@@ -267,10 +272,6 @@ class Excel {
     window.addEventListener("keydown",this.keyMove.bind(this))
     infiX_parent.addEventListener("scroll",this.infi1.bind(this))
     infiY_parent.addEventListener("scroll",this.infi2.bind(this))
-    canvas.addEventListener("contextmenu",(e) => 
-      this.right_click(e, this.canvas)
-    );
-
   }
  
   infi1(event){
@@ -284,10 +285,8 @@ class Excel {
   }
 
   resize_event(){
-
     canvas.width = this.container.offsetWidth-60;
     canvas.height = this.container.offsetHeight-30;
-
     this.infiX_parent.style.width=this.container.offsetWidth-60;
     this.infiY_parent.style.height=this.container.offsetHeight-30;
     this.header.width = this.container.offsetWidth-60;
@@ -316,10 +315,6 @@ class Excel {
       this.header1dhead.push(rectDatahead);
       counter += this.arr_width[j];
     }  
-    this.activeRow = this.header1dhead[0];
-    this.activeCol = this.header1dside[0];
-    
-   
   }
 
   drawSidebar() {
@@ -335,9 +330,8 @@ class Excel {
       rectDatahead["lineWidth"] = 1;
       this.header1dside.push(rectDatahead);
     }
-
-    this.activeCol = this.header1dhead[0];
-    this.activeRow = this.header1dside[0];
+    this.activeRow = this.header1dhead[0];
+    this.activeCol = this.header1dside[0];
   }
 
   resize(e, header) {
@@ -346,7 +340,6 @@ class Excel {
     let sum = 0;
     let edge_detected=false
     
-
     for (let i = 0; i < this.arr_width.length; i++) {
       const edge = this.arr_width[i];
       if (sum + 4 > x && x > sum) {
@@ -553,6 +546,17 @@ class Excel {
    x.setTransform(1,0,0,1,0,0)
  }
   
+ createActiveBottom(l2,t2){
+   this.ctx.restore()
+   this.ctx.save();
+   this.ctx.beginPath();
+   this.ctx.fillStyle="green"
+   this.ctx.clearRect(l2- this.scrollX-5,t2- this.scrollY-5,10,10)
+   this.ctx.rect(l2- this.scrollX-3,t2- this.scrollY-3,6,6)
+   this.ctx.fill()
+   this.ctx.save()
+ }
+
   createHighHeader(data, x) {
     x.save()
     x.beginPath();
@@ -617,37 +621,26 @@ class Excel {
     );
   }
 
-  clearHighCell(data, x) {
-    x.clearRect(
-      data.xpos - 2 - this.scrollX,
-      data.ypos - 2 - this.scrollY,
-      data.width + 4,
-      data.height + 4
-    );
-  }
-
-  clearHighHS(data, x) {
-    x.clearRect(
-      data.xpos - this.scrollX,
-      data.ypos - this.scrollY,
-      data.width ,
-      data.height 
-    );
-  }
-
   double_click(e, canvas) {
     e.preventDefault()
     let [x5, y5, sum] = this.showCoords(this.canvas, e);
     this.cell = this.arr2d[y5][x5 - 1];
     this.textbox_visible(this.cell);
+    
   }
 
-  right_click(e, canvas) {  
-    
-      e.preventDefault()
+  right_click(e, canvas) { 
+    e.preventDefault()
+
+    if(this.arr_selected.length>1){
+      this.cell=this.activeCell
+    }else{
       let [x5, y5, sum] = this.showCoords(this.canvas, e);
-      this.cell = this.arr2d[y5][x5 - 1];
+      this.activeCell = this.arr2d[y5][x5 - 1];
+      this.cell = this.activeCell
     
+      this.render()
+    }
     this.rightclick.style.display="block"
     this.rightclick.style.zIndex=1
     this.rightclick.style.height="200px"
@@ -685,18 +678,32 @@ class Excel {
     }
 
     var paste_cell = (e) => {
-      this.arr_selected.forEach((c) => (c.data = ""));
-      this.arr_selected.forEach((c) => this.clearCell(c, this.ctx));
-      this.arr_selected.forEach((c) => this.createCell(c, this.ctx));
-      this.activeCell.data = "";
-      this.clearCell(this.activeCell, this.ctx);
-      this.createCell(this.activeCell, this.ctx);
+    }
+
+    var sort_cell = (e) => {
+        let sort=[]
+        for (let i = 0; i < this.arr_selected.length; i++) {
+          sort.push(parseInt(this.arr_selected[i].data))
+        }
+        sort.sort((a,b) => a-b);
+        
+        for (let i = 0; i< this.arr_selected.length; i++) {
+          if(sort[i]==NaN)
+            continue
+          this.arr_selected[i].data=sort[i]
+        }
+        this.render()
+        // this.arr_selected.sort((a,b) => (0+a.data)-(0+b.data));
+        // this.arr_selected=this.arr_selected.map((c,i)=>{ c.data=this.arr_selected[i].data})
+        // this.render()
+    
     }
 
     this.rightclick_1.addEventListener("click",cut_cell);
     // this.rightclick_2.addEventListener("click",copy_cell);
     // this.rightclick_3.addEventListener("click",paste_cell);
-    this.rightclick_4.addEventListener("click",delete_cell);
+    this.rightclick_4.addEventListener("click",delete_cell);  
+    this.rightclick_5.addEventListener("click",sort_cell);
   }
 
   textbox_visible(cell) {
@@ -719,7 +726,6 @@ class Excel {
   }
 
   keyMove(e) { 
-
     if (e.shiftKey) {
       this.xscroll = true;
     } else {
@@ -728,15 +734,8 @@ class Excel {
     if(e.target==this.textbox){
       return
     }
-    if (this.arr_selected.length > 1) {
-      this.arr_selected.forEach((c) => this.clearHighCell(c, this.ctx));
-      this.arr_selected.forEach((c) => this.createCell(c, this.ctx));
-    }
     
-    this.clearHighCell(this.activeCell, this.ctx);
-    this.createCell(this.activeCell, this.ctx);
     let {rows,cols} = this.activeCell;
-
     if(e.key.match(/^\w$/)){
       this.textbox_visible(this.activeCell)
     }
@@ -748,13 +747,13 @@ class Excel {
       this.textbox.style.display = "none";
       if (cols <= 0) {
         this.activeCell = this.arr2d[rows][cols];
-        this.createHighCell(this.activeCell, this.ctx);
+       
       } else {
         this.activeCell = this.arr2d[rows][cols - 1];
       
         this.activeRow=this.header1dhead[cols-1]
         cols--;
-        this.createHighCell(this.activeCell, this.ctx);
+       
       }
     }else if (e.which == 39) {
       if(this.activeCell.xpos+200>this.scrollX+this.canvas.width)
@@ -764,9 +763,7 @@ class Excel {
       this.textbox.style.display = "none";
       this.activeCell = this.arr2d[rows][cols + 1];
       this.activeRow=this.header1dhead[cols+1]
-      this.createHighCell(this.activeCell, this.ctx);
-      this.render()
-      
+ 
     }else if (e.which == 38) {
       if(this.activeCell.ypos - this.activeCell.height < this.scrollY)
         {
@@ -775,12 +772,12 @@ class Excel {
       this.textbox.style.display = "none";
       if (rows <= 0) {
         this.activeCell = this.arr2d[rows][cols];
-        this.createHighCell(this.activeCell, this.ctx);
+        
       } else {
         this.activeCell = this.arr2d[rows - 1][cols];
         this.activeCol=this.header1dside[rows-1]
         rows--;
-        this.createHighCell(this.activeCell, this.ctx);
+       
       }
     }else if (e.which == 40) {
 
@@ -791,30 +788,24 @@ class Excel {
       this.textbox.style.display = "none";
       this.activeCell = this.arr2d[rows + 1][cols];
       this.activeCol=this.header1dside[rows+1]
-      this.createHighCell(this.activeCell, this.ctx);
+     
     } else if (e.which == 27) {
-      if (this.arr_selected.length > 1) {
-        this.arr_selected.forEach((c) => this.clearHighCell(c, this.ctx));
-        this.arr_selected.forEach((c) => this.createCell(c, this.ctx));
-      }
+      
     } else if (e.which == 9) {
       this.activeCell = this.arr2d[rows][cols + 1];
-      this.createHighCell(this.activeCell, this.ctx);
+      
     } else if (e.which == 46) {
       this.arr_selected.forEach((c) => (c.data = ""));
-      this.arr_selected.forEach((c) => this.clearCell(c, this.ctx));
-      this.arr_selected.forEach((c) => this.createCell(c, this.ctx));
       this.activeCell.data = "";
-      this.clearCell(this.activeCell, this.ctx);
-      this.createCell(this.activeCell, this.ctx);
+     
     }
     else if (e.which == 13) {
       this.textbox.style.display = "none";
       this.activeCell = this.arr2d[rows + 1][cols];
-      this.createHighCell(this.activeCell, this.ctx);
     }
+
+    this.arr_selected[0]=this.activeCell
     !e.shiftKey &&
-    
     this.render()
   }
 
@@ -837,27 +828,20 @@ class Excel {
   }
 
   mousedown(e, canvas) {
-    
     this.cut=false
     this.rightclick.style.display="none"
-    let n = (e) => this.keyMove(e, this.canvas, x1, y1);
     this.textbox.style.display = "none";
     this.counter++;
     let [x1, y1, sum1] = this.showCoords(this.canvas, e);
-    
-    if(this.arr_selected.includes(this.cell) && e.button==2){
+    if(this.arr_selected.length>1 && e.button==2){
       return
     }
     this.activeRow=this.header1dhead[x1-1]
     this.activeCol=this.header1dside[y1]
     this.activeCell = this.arr2d[y1][x1 - 1];
-    if (!this.val) {
-      window.addEventListener("keydown", n);
-      this.val = true;
-    }
-    
     this.arr_selected = [this.activeCell];
     this.cell_initial = this.arr2d[y1][x1 - 1];
+
     var mousemove = (e) => {
       let [x1, y1, sum] = this.showCoords(this.canvas, e);
       this.cell_final = this.arr2d[y1][x1 - 1];
@@ -883,11 +867,7 @@ class Excel {
       this.arr_diff = this.arr_selected.filter(
         (c) => this.arr_select_temp.indexOf(c) === -1
       );
-
-      this.arr_diff.forEach((c) => this.clearHighCell(c, this.ctx));
-      this.arr_diff.forEach((c) => this.createCell(c, this.ctx));
       this.arr_selected = this.arr_select_temp;
-    
 
       for (let index = 0; index < this.arr_selected.length; index++) {
         if (this.arr_selected[index].data != "") this.ele++;
@@ -913,12 +893,6 @@ class Excel {
   }
 
   highlightCells() {
-    
-    this.arr_selected.forEach((c) => {
-      this.clearHighCell(c, this.ctx);
-      this.createCell(c, this.ctx);
-    });
-
     let context = this.ctx;
     if(this.arr_selected.length<1)
       return
@@ -985,7 +959,6 @@ class Excel {
     this.htx.lineTo(leftX2-this.scrollX,30);
     this.htx.stroke()
     this.htx.restore()
-    
 
     this.stx.save()
     this.stx.beginPath()
@@ -1005,7 +978,6 @@ class Excel {
     this.stx.lineTo(60,topX2-this.scrollY);
     this.stx.stroke()
     this.stx.restore()
-
     context.clearRect(this.activeCell.xpos,this.activeCell.ypos,this.activeCell.width,this.activeCell.height)
     context.restore()
     this.createCell(this.activeCell, this.ctx);
@@ -1014,10 +986,7 @@ class Excel {
     if(this.cut){
       context.setLineDash([6,2])
       context.lineDashOffset=this.lineDashOffset
-
     }
-    
-
     context.beginPath();
     context.moveTo(leftX1, topX1);
     context.lineTo(leftX2, topX1);
@@ -1028,6 +997,8 @@ class Excel {
     context.lineWidth = 3;
     context.stroke()
     context.setTransform(1,0,0,1,0,0)
+    if(this.textbox.style.display=="none")
+      this.createActiveBottom(leftX2,topX2)
   }
 
   scroller(event) {
@@ -1166,7 +1137,7 @@ class Excel {
           if (j === row.length - 2) {
             this.extendData(10, 1);
           }
-          if (initWidth > canvaWidth + newScrollX) {
+          if (initWidth > canvaWidth + newScrollX+1000) {
             break;
           } 
           else {
@@ -1181,32 +1152,31 @@ class Excel {
     }
   }
 }  
-csv = `Sr. No.,First Name,Last Name,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age
-      1,Roy,Mas,21,156,Male,291,426,Male,561,696,Male,831,966,Male,1101,1236,Male,1371,1506,Male,1641
-      2,Ash,Lop,22,151,Male,280,409,Male,538,667,Male,796,925,Male,1054,1163,Male,1312,1441,Male,1570
-      3,Rit,Kha,32,123,Female,214,305,Female,396,487,Female,578,669,Female,760,851,Female,942,1033,Female,1124
-      4,Man,Pat,12,21,Male,30,39,Male,48,57,Male,66,75,Male,84,93,Male,102,111,Male,120
-      5,Roh,Sin,3,234,Female,465,696,Female,927,1158,Female,1389,1620,Female,1851,2082,Female,2313,2544,Female,2775
-      6,Vir,Pat,22,11,Female,0,-11,Female,-22,-33,Female,-44,-55,Female,-66,-77,Female,-88,-99,Female,-110
-      7,Abhi,Man,41,23,Female,5,-13,Female,-31,-49,Female,-67,-85,Female,-103,-121,Female,-139,-157,Female,-175
-      8,Raj,Sin,22,21,Male,20,19,Male,18,17,Male,16,15,Male,14,13,Male,12,11,Male,10
-      9,Moh,Pree,35,1,Male,-33,-67,Male,-101,-135,Male,-169,-203,Male,-237,-271,Male,-305,-339,Male,-373
-      10,Ajay,Pra,11,161,Female,311,461,Female,611,761,Female,911,1061,Female,1211,1361,Female,1511,1661,Female,1811
-      11,Jake,Lew,28,181,Male,334,487,Male,640,793,Male,946,1099,Male,1252,1405,Male,1558,1711,Male,1864
-      12,Si,Mi,20,190,Male,360,530,Male,700,870,Male,1040,1210,Male,1380,1550,Male,1720,1890,Male,2060
-      13,Jos,Hil,11,121,Female,231,341,Female,451,561,Female,671,781,Female,891,1001,Female,1111,1221,Female,1331
-      14,Ale,Pie,22,191,Male,360,529,Male,698,867,Male,1036,1205,Male,1374,1543,Male,1712,1881,Male,2050
-      15,Yir,Pro,43,167,Female,291,415,Female,539,663,Female,787,911,Female,1035,1159,Female,1283,1407,Female,1531
-      16,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
-      17,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
-      18,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
-      19,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
-      20,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
-      21,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
-      22,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
-      23,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
-      24,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
-      25,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
+csv =`Sr. No.,First Name,Last Name,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age
+1,Roy,Mas,21,156,Male,291,426,Male,561,696,Male,831,966,Male,1101,1236,Male,1371,1506,Male,1641
+2,Ash,Lop,22,151,Male,280,409,Male,538,667,Male,796,925,Male,1054,1163,Male,1312,1441,Male,1570
+3,Rit,Kha,32,123,Female,214,305,Female,396,487,Female,578,669,Female,760,851,Female,942,1033,Female,1124
+4,Man,Pat,12,21,Male,30,39,Male,48,57,Male,66,75,Male,84,93,Male,102,111,Male,120
+5,Roh,Sin,3,234,Female,465,696,Female,927,1158,Female,1389,1620,Female,1851,2082,Female,2313,2544,Female,2775
+6,Vir,Pat,22,11,Female,0,-11,Female,-22,-33,Female,-44,-55,Female,-66,-77,Female,-88,-99,Female,-110
+7,Abhi,Man,41,23,Female,5,-13,Female,-31,-49,Female,-67,-85,Female,-103,-121,Female,-139,-157,Female,-175
+8,Raj,Sin,22,21,Male,20,19,Male,18,17,Male,16,15,Male,14,13,Male,12,11,Male,10
+9,Moh,Pree,35,1,Male,-33,-67,Male,-101,-135,Male,-169,-203,Male,-237,-271,Male,-305,-339,Male,-373
+10,Ajay,Pra,11,161,Female,311,461,Female,611,761,Female,911,1061,Female,1211,1361,Female,1511,1661,Female,1811
+11,Jake,Lew,28,181,Male,334,487,Male,640,793,Male,946,1099,Male,1252,1405,Male,1558,1711,Male,1864
+12,Si,Mi,20,190,Male,360,530,Male,700,870,Male,1040,1210,Male,1380,1550,Male,1720,1890,Male,2060
+13,Jos,Hil,11,121,Female,231,341,Female,451,561,Female,671,781,Female,891,1001,Female,1111,1221,Female,1331
+14,Ale,Pie,22,191,Male,360,529,Male,698,867,Male,1036,1205,Male,1374,1543,Male,1712,1881,Male,2050
+15,Yir,Pro,43,167,Female,291,415,Female,539,663,Female,787,911,Female,1035,1159,Female,1283,1407,Female,1531
+16,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
+17,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
+18,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
+19,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
+20,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
+21,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
+22,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
+23,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
+24,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
+25,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
       `;
-
 let excel = new Excel(csv.repeat(2), document.querySelector(".container"));
