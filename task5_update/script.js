@@ -22,32 +22,24 @@ class Excel {
  * @param {HTMLDivElement} container wrapper for Excel 
  */
   constructor(csv, container) {
-    this.arr_selected = [];
     this.csv = csv;
     this.lineDashOffset=0;
     this.container = container;
     this.createcanvas();
     this.csvToExcel();
-    this.max_c = 0;
-    this.min_c = 0;
-    this.max_r = 0;
-    this.min_r = 0;
     this.math_sum = 0;
     this.scrollX = 0;
     this.scrollY = 0;
     this.xscroll = false;
-    
     this.header1dhead = [];
     this.header1dside = [];
     this.extendHeader(100-this.arr2d[0].length)
     this.extendSidebar(50)
     this.busy=null
-    this.x = 0;
     this.dx=0
     this.dy =0
     this.first=false
     this.col_selection=false
-    
     this.render()
   }
 
@@ -333,6 +325,9 @@ class Excel {
     this.render()
   }
 
+  /**
+   * Converts 1D Array to 2D Array
+   */
   arrayConverter(){
     let arr_selected_2d=[]
     let arr_selected_1d=[]
@@ -351,6 +346,7 @@ class Excel {
     arr_selected_2d[arr_selected_2d.length-1].push(this.arr_selected[i])
     this.arr_selected_2d=arr_selected_2d
   }
+  
   /**
    * Used to handle resizing of window
    */
@@ -904,15 +900,11 @@ class Excel {
       let r2 = this.cell_final.rows;
       let c1 = this.cell_initial.cols;
       let c2 = this.cell_final.cols;
-      this.max_r = Math.max(r1, r2);
-      this.min_r = Math.min(r1, r2);
-      this.max_c = Math.max(c1, c2);
-      this.min_c = Math.min(c1, c2);
       this.math_sum = 0;
       this.arr_select_temp = [];
       let ele = 0;
-      for (var i = this.min_r; i <= this.max_r; i++) {
-        for (var j = this.min_c; j <= this.max_c; j++) {
+      for (var i = Math.min(r1, r2); i <=  Math.max(r1, r2); i++) {
+        for (var j = Math.min(c1, c2); j <= Math.max(c1, c2); j++) {
           this.final_cell = this.arr2d[i][j];
           this.arr_select_temp.push(this.final_cell);
           this.math_sum += parseInt(this.final_cell.data) || 0;
@@ -1297,7 +1289,6 @@ class Excel {
     let newScrollY = this.dy;
     let newScrollX = this.dx;
     
-
     for (let i = Math.max(0,(newScrollY -1200))/ 30  ; i < this.arr2d.length; i++) {  
       const row = this.arr2d[i];
       if (i === this.arr2d.length - 1) {
@@ -1422,7 +1413,6 @@ class Graph{
     });
   }
 }
-
 
 csv =`Sr. No.,First Name,Last Name,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age,Height,Gender,Age
 1,Roy,Mas,21,156,Male,291,426,Male,561,696,Male,831,966,Male,1101,1236,Male,1371,1506,Male,1641
