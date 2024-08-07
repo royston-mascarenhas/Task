@@ -25,20 +25,18 @@ class Excel {
     this.csv = csv;
     this.lineDashOffset=0;
     this.container = container;
+    this.header1dhead = [];
+    this.header1dside = [];
     this.createcanvas();
     this.csvToExcel();
     this.math_sum = 0;
     this.scrollX = 0;
     this.scrollY = 0;
     this.xscroll = false;
-    this.header1dhead = [];
-    this.header1dside = [];
-    this.extendHeader(100-this.arr2d[0].length)
-    this.extendSidebar(50)
     this.busy=null
     this.dx=0
     this.dy =0
-    this.first=false
+    this.first=true
     this.col_selection=false
     this.render()
   }
@@ -57,7 +55,7 @@ class Excel {
       this.highlightCells()
       this.smooth()
       this.infiX.style.width =`${this.arr2d[0].length*100}px` 
-      this.infiY.style.height =`${(this.arr2d.length/1.55)*30}px` 
+      this.infiY.style.height =`${(this.arr2d.length)*30}px` 
       this.lineDashOffset-=1
       if(this.cut)
       this.render()
@@ -100,6 +98,8 @@ class Excel {
       counter += this.arr_width[j];
     }
     this.arr2d.push(this.header1d);
+
+    
     for (let i = 1; i < lines.length; i++) {
       counter = 0;
       let data1d = [];
@@ -118,7 +118,12 @@ class Excel {
         counter += this.arr_width[j];
       }
       this.arr2d.push(data1d);
+
+
     }
+    this.extendHeader(this.arr2d[0].length)
+    this.extendSidebar(this.arr2d.length)
+
     this.activeCell = this.arr2d[0][0];
     this.arr_selected=[this.activeCell]
   }
@@ -141,8 +146,8 @@ class Excel {
     this.rightclick_3 = document.createElement("div")
     this.rightclick_4 = document.createElement("div")
     this.rightclick_5 = document.createElement("div")
+    this.rightclick_6 = document.createElement("div")
 
-   
 
     this.rightclick.style.textAlign="left"
     this.rightclick.style.padding="10px"
@@ -156,13 +161,16 @@ class Excel {
     this.rightclick_2.textContent="COPY"
 
     this.rightclick_3.style.height="40px"
-    this.rightclick_3.textContent="GRAPH"
+    this.rightclick_3.textContent="PASTE"
 
     this.rightclick_4.style.height="40px"
     this.rightclick_4.textContent="DELETE"
 
     this.rightclick_5.style.height="40px"
     this.rightclick_5.textContent="SORT"
+
+    this.rightclick_6.style.height="40px"
+    this.rightclick_6.textContent="GRAPH"
     
 
     let infiX_parent = document.createElement("div")
@@ -249,8 +257,7 @@ class Excel {
     this.rightclick.appendChild(this.rightclick_3)
     this.rightclick.appendChild(this.rightclick_4)
     this.rightclick.appendChild(this.rightclick_5)
-
-    
+    this.rightclick.appendChild(this.rightclick_6)
 
     this.canvas.style.cursor="cell"
     this.container.style.fontSize="0px"
@@ -283,6 +290,12 @@ class Excel {
     window.addEventListener("keydown",this.keyMove.bind(this))
     infiX_parent.addEventListener("scroll",this.infi1.bind(this))
     infiY_parent.addEventListener("scroll",this.infi2.bind(this))
+    this.rightclick_1.addEventListener("click",this.cut_cell);
+    this.rightclick_2.addEventListener("click",this.copy_cell);
+    this.rightclick_3.addEventListener("click",this.paste_cell);
+    this.rightclick_4.addEventListener("click",this.delete_cell);  
+    this.rightclick_5.addEventListener("click",this.sort_cell);
+    this.rightclick_6.addEventListener("click",this.graph_cell);
   }
   
   /**
@@ -299,6 +312,11 @@ class Excel {
         this.canvas.style.cursor="grab"
         this.grab_detected=true
       }
+
+    else if((x>this.l2-3 && x<this.l2+5 && y>this.t2-3 && y<this.t2+5)){
+      this.canvas.style.cursor="crosshair"
+      this.crosshair_detected=true
+    }
     else{
       if(!this.nograbchange){
         this.canvas.style.cursor="cell"
@@ -334,17 +352,16 @@ class Excel {
   
     let i=0
     for (; i < this.arr_selected.length-1; i++) {
-      
       arr_selected_1d.push(this.arr_selected[i])
-
       if(this.arr_selected[i].ypos!=this.arr_selected[i+1].ypos){
         arr_selected_2d.push(arr_selected_1d)
         arr_selected_1d=[]
       }
-      
     }
+    arr_selected_2d.push(arr_selected_1d)
     arr_selected_2d[arr_selected_2d.length-1].push(this.arr_selected[i])
     this.arr_selected_2d=arr_selected_2d
+    
   }
   
   /**
@@ -359,7 +376,7 @@ class Excel {
     this.header.height = 30;
     this.sidebar.width = 60;
     this.sidebar.height = this.container.offsetHeight - 30;
-    this.drawOptimized()
+    this.render()
   }
 
   /**
@@ -539,16 +556,16 @@ class Excel {
    * @param {CanvasRenderingContext2D} x 
    */
   createCellH(data,x){
-  switch (x) {
-    case this.stx:
-        x.translate(this.scrollX, 0)
-        break;
-    case this.htx:
-        x.translate(0, this.scrollY)
-        break;
-    default:
-        break;
-            }
+    switch (x) {
+      case this.stx:
+          x.translate(this.scrollX, 0)
+          break;
+      case this.htx:
+          x.translate(0, this.scrollY)
+          break;
+      default:
+          break;
+              }
  
     x.save();
     x.beginPath();
@@ -581,21 +598,21 @@ class Excel {
    * @param {CanvasRenderingContext2D} x 
    */
   createCellS(data,x){
-  switch (x) {
-   case this.stx:
-       x.translate(this.scrollX, 0)
-       break;
-   case this.htx:
-       x.translate(0, this.scrollY)
-       break;
-   default:
-       break;
-           }
+    switch (x) {
+      case this.stx:
+          x.translate(this.scrollX, 0)
+          break;
+      case this.htx:
+          x.translate(0, this.scrollY)
+          break;
+      default:
+          break;
+              }
    x.save();
    x.beginPath();
    x.fillStyle="#80808033"
    x.rect(
-     data.xpos - this.scrollX,
+    data.xpos - this.scrollX,
      data.ypos - this.scrollY,
      data.width,
      data.height
@@ -651,7 +668,9 @@ class Excel {
    */
   right_click(e, canvas) { 
     e.preventDefault()
-
+    let [x1, y1, sum] = this.showCoords(this.canvas, e);
+    this.px1=x1
+    this.py1=y1
     if(this.arr_selected.length>1){
       this.cell=this.activeCell
     }else{
@@ -661,7 +680,6 @@ class Excel {
     }
     this.rightclick.style.display="block"
     this.rightclick.style.zIndex=1
-    this.rightclick.style.height="200px"
     this.rightclick.style.width="200px"
     this.rightclick.style.position="absolute"
     if(this.cell.ypos+270-this.scrollY<window.innerHeight){
@@ -676,62 +694,97 @@ class Excel {
        this.rightclick.style.left=`${this.cell.xpos-165-this.scrollX}px`
     }
     this.rightclick.style.background="white"
+  }
 
-    var delete_cell = (e) => {
-      this.rightclick.style.display="none"
-      this.arr_selected.forEach((c) => (c.data = ""));
-      this.activeCell.data = "";
-      this.render()
-    }
+  delete_cell = (e) => {
+    this.rightclick.style.display="none"
+    this.arr_selected.forEach((c) => (c.data = ""));
+    this.activeCell.data = "";
+    this.render()
+  }
 
-    var cut_cell = (e) => {
-      this.rightclick.style.display="none"
-      this.cut=true
-      this.render()
-    }
+  cut_cell = (e) => {
+    this.rightclick.style.display="none"
+    this.cut=true
+    this.op_cut=true
+    this.first=false
+    this.render()
+    this.arrayConverter()
+    let clipboard=this.arr_selected_2d.map(r=>r.map(c=>c.data).join(",")).join("\n")
+    navigator.clipboard.writeText(clipboard);
+  }
 
-    var copy_cell = (e) => {
-    }
+  copy_cell = (e) => {
+    this.rightclick.style.display="none"
+    this.cut=true
+    this.first=false
+    this.render()
+    this.arrayConverter()
+    let clipboard=this.arr_selected_2d.map(r=>r.map(c=>c.data).join(",")).join("\n")
+    navigator.clipboard.writeText(clipboard);
+  }
 
-    var graph_cell = (e) => {
-     
-      this.arrayConverter()
-      const config={
-        height:500,
-        width:500,
-        x:100,
-        y:100
-      }
+   paste_cell = (e) => {
+    if(this.first)
+      return
 
-      const a= new Graph(this.arr_selected_2d,this.canvas_parent,config,"line")
-      a.render()
-
-    }
-
-    var sort_cell = (e) => {
-        let sort=[]
-        for (let i = 0; i < this.arr_selected.length; i++) {
-          sort.push(parseInt(this.arr_selected[i].data))
+    this.rightclick.style.display="none"
+    if(this.arr_selected_2d.length>1){
+      for (let i = 0; i < this.arr_selected_2d.length; i++) {
+        for (let j = 0; j < this.arr_selected_2d[0].length; j++) {
+            this.arr2d[this.py1+i][this.px1-1+j].data=this.arr_selected_2d[i][j].data
+            if(this.op_cut){
+              this.arr_selected_2d[i][j].data=""
+              this.first=true
+            }
+          }
         }
-        sort.sort((a,b) => a-b);
+        this.op_cut=false  
         
-        for (let i = 0; i< this.arr_selected.length; i++) {
-          if(sort[i]==NaN)
-            continue
-          this.arr_selected[i].data=sort[i]
+      }
+    else{
+        this.arr2d[this.py1][this.px1-1].data=this.arr_selected_2d[0][0].data
+        if(this.op_cut){
+          this.arr_selected_2d[0][0].data=""
+          this.op_cut=false
+          this.first=true
         }
-        this.render()
-        // this.arr_selected.sort((a,b) => (0+a.data)-(0+b.data));
-        // this.arr_selected=this.arr_selected.map((c,i)=>{ c.data=this.arr_selected[i].data})
-        // this.render()
-    
+      }
+    this.render()
+}
+
+   graph_cell = (e) => {
+    this.rightclick.style.display="none"
+    this.arrayConverter()
+    const config={
+      height:300,
+      width:500,
+      x:100,
+      y:100
     }
 
-    this.rightclick_1.addEventListener("click",cut_cell);
-    // this.rightclick_2.addEventListener("click",copy_cell);
-    this.rightclick_3.addEventListener("click",graph_cell);
-    this.rightclick_4.addEventListener("click",delete_cell);  
-    this.rightclick_5.addEventListener("click",sort_cell);
+    const a= new Graph(this.arr_selected_2d,this.canvas_parent,config,"line")
+    a.render()
+
+  }
+
+   sort_cell = (e) => {
+      let sort=[]
+      for (let i = 0; i < this.arr_selected.length; i++) {
+        sort.push(parseInt(this.arr_selected[i].data))
+      }
+      sort.sort((a,b) => a-b);
+      
+      for (let i = 0; i< this.arr_selected.length; i++) {
+        if(sort[i]==NaN)
+          continue
+        this.arr_selected[i].data=sort[i]
+      }
+      this.render()
+      // this.arr_selected.sort((a,b) => (0+a.data)-(0+b.data));
+      // this.arr_selected=this.arr_selected.map((c,i)=>{ c.data=this.arr_selected[i].data})
+      // this.render()
+  
   }
 
   /**
@@ -884,6 +937,7 @@ class Excel {
    * @returns 
    */
   mousedown(e, canvas) {
+  
     this.col_selection=false
     this.nograbchange=true
     var mousemove = (e) => {
@@ -921,26 +975,44 @@ class Excel {
       }
       console.log(this.math_sum)
       console.log(ele)
-     
       this.render()
     };
     var mouseup = (e) => {
+      let arr_selected_temp=[]
+      let [x1, y1, sum] = this.showCoords(this.canvas, e);
+      
       if(this.grab_detected){
-        this.canvas.style.cursor="grab"
-
-        this.cell_final.data=this.arr_selected[0].data
+        if(this.arr_selected.length>1){
+          this.arrayConverter()
+          this.canvas.style.cursor="grab"
+          for (let i = 0; i < this.arr_selected_2d.length; i++) {
+            for (let j = 0; j < this.arr_selected_2d[0].length; j++) {
+              this.arr2d[y1+i][x1-1+j].data=this.arr_selected_2d[i][j].data
+              arr_selected_temp.push(this.arr2d[y1+i][x1-1+j])
+              this.arr_selected_2d[i][j].data=""
+            }
+          }
+          this.activeCell=arr_selected_temp[0]
+          console.log(arr_selected_temp)
+          this.arr_selected=arr_selected_temp
+          this.render()   
+      }
+      else{
+        this.arr2d[y1][x1-1].data=this.arr_selected[0].data
         this.arr_selected[0].data=""
         this.arr_selected=[this.cell_final]
+      }
+
+       
         this.nograbchange=false
         canvas.removeEventListener("mousemove", mousemove);
         canvas.removeEventListener("mousedown", this.mousedown);
         canvas.removeEventListener("mouseup", mouseup);
         this.render()
       }
-      
       else{
         this.nograbchange=false
-         this.canvas.style.cursor="cell"
+        this.canvas.style.cursor="cell"
         this.cell=this.activeCell
         this.activeCell=this.cell_initial
         canvas.removeEventListener("mousemove", mousemove);
@@ -949,6 +1021,7 @@ class Excel {
         this.render()
       }
      
+      
     };
     var mouseleave=(e)=>{
       this.canvas.removeEventListener("mousemove", mousemove);
@@ -1103,7 +1176,6 @@ class Excel {
    * @param {WheelEvent} event 
    */
   scroller(event) {
-    
     this.rightclick.style.display="none"
     this.textbox.style.display="none"
     let {deltaX, deltaY } = event;
@@ -1211,7 +1283,7 @@ class Excel {
    * @param {number} count 
    */
   extendSidebar(count){
-    if(this.header1dside<1){
+    if(this.header1dside.length<1){
       let rectDatahead = {};
       rectDatahead["xpos"] = 0;
       rectDatahead["ypos"] = 0;
@@ -1271,54 +1343,79 @@ class Excel {
     return pow ? this.toLetters(pow) + out : out;
   }
 
+  clearData(){
+    this.htx.clearRect(0, 0, this.header.width, this.header.height);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.stx.clearRect(0, 0, this.sidebar.width, this.sidebar.height);
+  }
+
   /**
    * Optimized drawing as per screen width & height
    */
   drawOptimized() {
-    this.htx.clearRect(0, 0, this.header.width, this.header.height);
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.stx.clearRect(0, 0, this.sidebar.width, this.sidebar.height);
-
-    if(!this.first){
-      this.arr_selected = [this.activeCell];
-      this.first=true
+    this.extracells=10
+    if (!this.arr2d.length) {
+      return;
     }
-    let canvaWidth = this.canvas.offsetWidth;
-    let canvaHeight = this.canvas.offsetHeight;
-    let initHeight = 0;
-    let newScrollY = this.dy;
-    let newScrollX = this.dx;
-    
-    for (let i = Math.max(0,(newScrollY -1200))/ 30  ; i < this.arr2d.length; i++) {  
-      const row = this.arr2d[i];
-      if (i === this.arr2d.length - 1) {
-        this.extendData(10, 2);
+    let initialCol = this.binarySearch(this.arr2d[0], this.scrollX);
+    let initialRow = this.binarySearch(
+      this.arr2d.map((d) => d[0]),
+      this.scrollY,
+      true
+    );
+    let finalRow = initialRow;
+    let finalCol = 0;
+ 
+    for (let j = initialRow; j < this.arr2d.length; j++) {
+      finalCol = initialCol;
+      finalRow++;
+      for (let j = initialCol; j < this.arr2d[0].length; j++) {
+        finalCol++;
+        if (
+          this.arr2d[0][j].xpos >
+          this.canvas.offsetWidth + this.scrollX
+        ){
+          break;}
       }
-      if (initHeight > canvaHeight + newScrollY+1200) {
+      if (
+        this.arr2d[j][0].ypos >
+        this.canvas.offsetHeight + this.scrollY
+      )
         break;
-      } 
-      else {
-        let initWidth = 0;
-        initHeight += row[0].height;
-        this.createCellS(this.header1dside[i],this.stx)
-        for (let j = 0; j < row.length; j++) {
-          if (j === row.length - 2) {
-            this.extendData(10, 1);
-          }
-          if (initWidth > canvaWidth + newScrollX+1000) {
-            break;
-          } 
-          else {
-            initWidth += row[j].width;
-            const col = row[j];
-            this.createCell(col, this.ctx);
-            if( i == newScrollY / 30)
-            this.createCellH(this.header1dhead[j],this.htx)
-          }
-        }
+    }
+ 
+    if (Math.abs(finalRow - this.arr2d.length) < 50) {
+      this.extendData(100, 2);
+    }
+    if (Math.abs(initialCol - this.arr2d[0].length) < 50) {
+      this.extendData(100, 1);
+    }
+    this.clearData();
+    for (
+      let i = Math.max(initialRow - this.extracells, 0);
+      i < Math.min(finalRow + this.extracells, this.arr2d.length);
+      i++
+    ) {
+      this.createCellS(this.header1dside[i],this.stx)
+      for (
+        let j = Math.max(initialCol - this.extracells, 0);
+        j < Math.min(finalCol + this.extracells, this.arr2d[0].length);
+        j++
+      ) {
+        this.createCell(this.arr2d[i][j],this.ctx);
+        
       }
+    }
+    for (
+      let j = Math.max(initialCol - this.extracells, 0);
+      j < Math.min(finalCol + this.extracells, this.arr2d[0].length);
+      j++
+    ) {
+      this.createCellH(this.header1dhead[j],this.htx);
+      
     }
   }
+
 } 
 
 class Graph{
