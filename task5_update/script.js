@@ -148,7 +148,6 @@ class Excel {
     this.rightclick_5 = document.createElement("div")
     this.rightclick_6 = document.createElement("div")
 
-
     this.rightclick.style.textAlign="left"
     this.rightclick.style.padding="10px"
     this.rightclick.style.border="solid 1px black"
@@ -156,7 +155,6 @@ class Excel {
     this.rightclick_1.style.height="40px"
     this.rightclick_1.textContent="CUT"
     
-
     this.rightclick_2.style.height="40px"
     this.rightclick_2.textContent="COPY"
 
@@ -172,7 +170,6 @@ class Excel {
     this.rightclick_6.style.height="40px"
     this.rightclick_6.textContent="GRAPH"
     
-
     let infiX_parent = document.createElement("div")
     this.infiX_parent=infiX_parent
     this.infiX = document.createElement("div")
@@ -216,7 +213,6 @@ class Excel {
     canvas.id = "canvas";
 
     this.canvas = canvas;
-
     infiX_parent.style.width="1860px"
     infiX_parent.style.height="20px"
     infiX_parent.style.overflowX="scroll"
@@ -232,7 +228,6 @@ class Excel {
     infiY_parent.style.right=0
       
     this.rightclick.style.display="none"
-
     this.textbox.style.outline="none"
     this.textbox.style.paddingLeft ="8px"
     this.textbox.style.paddingTop ="9px"
@@ -241,7 +236,6 @@ class Excel {
     this.canvas_parent.appendChild(this.canvas);
     this.canvas_parent.appendChild(this.textbox);
     this.container.appendChild(this.canvas_parent);
-
     this.ctx = canvas.getContext("2d");
 
     this.container.appendChild(sidebar);
@@ -309,11 +303,21 @@ class Excel {
     let y = e.clientY - rect.top+this.scrollY;
     if((x>this.l1-3 && x<this.l1+5 && y>this.t1-3 && y<this.t1+5) ||(x>this.l2-3 && x<this.l2+5 && y>this.t1-3 && y<this.t1+5) || (x>this.l1-3 && x<this.l1+5 && y>this.t2-3 && y<this.t2+5))
       {
+        if(this.crosshair_detected)
+          return
+
+        if(this.selection_mode)
+          return
         this.canvas.style.cursor="grab"
         this.grab_detected=true
       }
 
-    else if((x>this.l2-3 && x<this.l2+5 && y>this.t2-3 && y<this.t2+5)){
+    else if((x>this.l2-5 && x<this.l2 && y>this.t2-5&& y<this.t2)){
+      if(this.grab_detected)
+        return
+
+      if(this.selection_mode)
+        return
       this.canvas.style.cursor="crosshair"
       this.crosshair_detected=true
     }
@@ -321,6 +325,7 @@ class Excel {
       if(!this.nograbchange){
         this.canvas.style.cursor="cell"
         this.grab_detected=false
+        this.crosshair_detected=false
       }
     }
   }
@@ -360,8 +365,7 @@ class Excel {
     }
     arr_selected_2d.push(arr_selected_1d)
     arr_selected_2d[arr_selected_2d.length-1].push(this.arr_selected[i])
-    this.arr_selected_2d=arr_selected_2d
-    
+    this.arr_selected_2d=arr_selected_2d  
   }
   
   /**
@@ -389,15 +393,13 @@ class Excel {
     let x = e.clientX - rect.left+this.scrollX;
     let sum = 0;
     this.edge_detected=false
-    
+
     for (let i = 0; i < this.arr_width.length; i++) {
       const edge = this.arr_width[i];
       if (sum + 4 > x && x > sum) {
         header.style.cursor = "col-resize";
         this.edge_detected=true
         this.col_selection=false
-  
-      
         break;
       } else {
         // this.header.addEventListener("mousedown", (e) =>
@@ -407,7 +409,6 @@ class Excel {
         this.edge_detected=true
         else
         this.edge_detected=false
-
         this.col_selection=true
         header.style.cursor = "default"; 
       }
@@ -454,10 +455,8 @@ class Excel {
       }
       this.widthAdj()
       this.render()
-      }
-      
-      }
-      
+      }  
+    }  
     };
     
     var mouseleave=(e)=>{
@@ -827,17 +826,12 @@ class Excel {
     if(e.target==this.textbox){
       return
     }
-    
     let {rows,cols} = this.activeCell;
-    if(e.key.match(/^\w$/)){
-      this.textbox_visible(this.activeCell)
-    }
-
-    if(this.arr_width.length>1 && this.textbox.style.display=="none"){
-      this.arr_selected=[]
-    }
-
-    if (e.which == 37) {
+    
+    if (e.key == "ArrowLeft") {
+      if(this.arr_width.length>1 && this.textbox.style.display=="none"){
+        this.arr_selected=[]
+      }
       if(this.activeCell.xpos - this.activeCell.width < this.scrollX)
         {
           this.dx=Math.max(0,this.dx-100)
@@ -853,7 +847,10 @@ class Excel {
         cols--;
        
       }
-    }else if (e.which == 39) {
+    }else if (e.key == "ArrowRight") {
+      if(this.arr_width.length>1 && this.textbox.style.display=="none"){
+        this.arr_selected=[]
+      }
       if(this.activeCell.xpos+200>this.scrollX+this.canvas.width)
       {
         this.dx+=100
@@ -862,7 +859,10 @@ class Excel {
       this.activeCell = this.arr2d[rows][cols + 1];
       this.activeRow=this.header1dhead[cols+1]
  
-    }else if (e.which == 38) {
+    }else if (e.key == "ArrowUp") {
+      if(this.arr_width.length>1 && this.textbox.style.display=="none"){
+        this.arr_selected=[]
+      }
       if(this.activeCell.ypos - this.activeCell.height < this.scrollY)
         {
           this.dy=Math.max(0,this.dy-90)
@@ -876,8 +876,10 @@ class Excel {
         rows--;
       }
 
-    }else if (e.which == 40) {
-
+    }else if (e.key == "ArrowDown") {
+      if(this.arr_width.length>1 && this.textbox.style.display=="none"){
+        this.arr_selected=[]
+      }
       if(this.activeCell.ypos+30>this.scrollY+this.canvas.height)
         {
           this.dy+=90
@@ -886,22 +888,40 @@ class Excel {
       this.activeCell = this.arr2d[rows + 1][cols];
       this.activeCol=this.header1dside[rows+1]
      
-    } else if (e.which == 27) {
+    }else if (e.which == 27) {
       
-    } else if (e.which == 9) {
+    }else if (e.key == "Tab") {
+      e.preventDefault()
       this.activeCell = this.arr2d[rows][cols + 1];
       
-    } else if (e.which == 46) {
+    }else if (e.key == "Delete") {
+      console.log(this.arr_selected)
       this.arr_selected.forEach((c) => (c.data = ""));
       this.activeCell.data = "";
+      this.render()
      
     }
-    else if (e.which == 13) {
+    else if (e.key == "Backspace") {
+      this.activeCell.data = "";
+      this.textbox_visible(this.activeCell)
+      this.render()
+    }
+    else if (e.key == "Enter") {
       this.textbox.style.display = "none";
       this.activeCell = this.arr2d[rows + 1][cols];
     }
-
-    this.arr_selected[0]=this.activeCell
+    else if (e.ctrlKey && e.key == "c") {
+      this.copy_cell()
+    }
+    else if (e.ctrlKey && e.key == "v") {
+      this.paste_cell()
+    }
+    else if (e.ctrlKey && e.key == "x") {
+      this.cut_cell()
+    }
+    if(e.key.match(/^\w$/)){
+      this.textbox_visible(this.activeCell)
+    }
     !e.shiftKey &&
     this.render()
   }
@@ -931,23 +951,47 @@ class Excel {
   }
 
   /**
-   * Used to identify the mousedone event
+   * Used to identify the mousedown event
    * @param {MouseEvent} e 
    * @param {HTMLCanvasElement} canvas 
    * @returns 
    */
   mousedown(e, canvas) {
-  
     this.col_selection=false
     this.nograbchange=true
+    this.selection_mode=true
     var mousemove = (e) => {
       if(this.grab_detected){
+        if(this.crosshair_detected)
+          return
+        if(this.selection_mode)
+          return
         this.canvas.style.cursor="grabbing"
         let [x1, y1, sum] = this.showCoords(this.canvas, e);
         this.cell_final = this.arr2d[y1][x1 - 1];
         this.render()
         return
       }
+      if(this.crosshair_detected){
+        this.canvas.style.cursor="crosshair"
+        let [x1, y1, sum] = this.showCoords(this.canvas, e);
+        let rect = canvas.getBoundingClientRect();
+        let x = e.clientX - rect.left+this.scrollX;
+        let y = e.clientY - rect.top+this.scrollY;
+        if(Math.abs(this.activeCell.xpos+this.activeCell.width-x)>Math.abs(this.activeCell.ypos+this.activeCell.height-y))
+          {
+            this.cell_final = this.arr2d[this.activeCell.rows][x1 - 1];
+          }
+        else
+          this.cell_final = this.arr2d[y1][this.activeCell.cols];
+
+        this.grab_detected=false
+        this.arr_selected.push(this.cell_final)
+        this.render()
+        return
+      }
+
+      this.grab_detected=false
       let [x1, y1, sum] = this.showCoords(this.canvas, e);
       this.cell_final = this.arr2d[y1][x1 - 1];
       let r1 = this.cell_initial.rows;
@@ -979,9 +1023,9 @@ class Excel {
     };
     var mouseup = (e) => {
       let arr_selected_temp=[]
-      let [x1, y1, sum] = this.showCoords(this.canvas, e);
-      
+      let [x1, y1, sum] = this.showCoords(this.canvas, e);  
       if(this.grab_detected){
+        this.cell_final = this.arr2d[y1][x1 - 1];
         if(this.arr_selected.length>1){
           this.arrayConverter()
           this.canvas.style.cursor="grab"
@@ -1001,10 +1045,36 @@ class Excel {
         this.arr2d[y1][x1-1].data=this.arr_selected[0].data
         this.arr_selected[0].data=""
         this.arr_selected=[this.cell_final]
+        this.render()   
       }
 
        
         this.nograbchange=false
+        canvas.removeEventListener("mousemove", mousemove);
+        canvas.removeEventListener("mousedown", this.mousedown);
+        canvas.removeEventListener("mouseup", mouseup);
+        this.render()
+      }
+      if(this.crosshair_detected){
+        let minr=Math.min(this.cell_initial.rows,this.cell_final.rows)
+        let minc=Math.min(this.cell_initial.cols,this.cell_final.cols)
+        let maxr=Math.max(this.cell_initial.rows,this.cell_final.rows)
+        let maxc=Math.max(this.cell_initial.cols,this.cell_final.cols)
+        console.log(minr,minc,maxr,maxc)
+        this.arr_selected=[]
+        for (let i = minr; i <= maxr; i++) {
+          for (let j = minc; j <= maxc; j++) {
+            console.log("hello")
+            this.arr2d[i][j].data=this.cell_initial.data
+            this.arr_selected.push(this.arr2d[i][j])
+          }
+        }
+        this.crosshair_detected=false
+        this.render()
+        this.nograbchange=false
+        this.canvas.style.cursor="cell"
+        this.cell=this.activeCell
+        this.activeCell=this.cell_initial
         canvas.removeEventListener("mousemove", mousemove);
         canvas.removeEventListener("mousedown", this.mousedown);
         canvas.removeEventListener("mouseup", mouseup);
@@ -1020,8 +1090,8 @@ class Excel {
         canvas.removeEventListener("mouseup", mouseup);
         this.render()
       }
-     
-      
+      console.log(this.arr_selected)
+      this.selection_mode=false
     };
     var mouseleave=(e)=>{
       this.canvas.removeEventListener("mousemove", mousemove);
@@ -1243,12 +1313,12 @@ class Excel {
     }
   }
   }
+
    /**
    * Used for creation and extention of Header
    * @param {number} count 
    */
   extendHeader(count){
-
     if(this.header1dhead.length<1){
       let rectDatahead = {};
       rectDatahead["xpos"] = 0;
@@ -1260,7 +1330,6 @@ class Excel {
       rectDatahead["lineWidth"] = 1;
       this.header1dhead.push(rectDatahead);
     }
-
     let row=this.header1dhead  
     let prevColumns = row.length;
     for (let j = prevColumns; j < prevColumns + count; j++) {
@@ -1383,7 +1452,6 @@ class Excel {
       )
         break;
     }
- 
     if (Math.abs(finalRow - this.arr2d.length) < 50) {
       this.extendData(100, 2);
     }
@@ -1402,8 +1470,7 @@ class Excel {
         j < Math.min(finalCol + this.extracells, this.arr2d[0].length);
         j++
       ) {
-        this.createCell(this.arr2d[i][j],this.ctx);
-        
+        this.createCell(this.arr2d[i][j],this.ctx);  
       }
     }
     for (
@@ -1415,7 +1482,6 @@ class Excel {
       
     }
   }
-
 } 
 
 class Graph{
