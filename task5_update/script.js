@@ -694,14 +694,20 @@ class Excel {
     }
     this.rightclick.style.background="white"
   }
-
+/**
+ * Delete value inside a cell or set of cells
+ * @param {MouseEvent|KeyboardEvent} e 
+ */
   delete_cell = (e) => {
     this.rightclick.style.display="none"
     this.arr_selected.forEach((c) => (c.data = ""));
     this.activeCell.data = "";
     this.render()
   }
-
+/**
+ * Cuts  a cell or set of cells
+ * @param {MouseEvent|KeyboardEvent} e 
+ */
   cut_cell = (e) => {
     this.rightclick.style.display="none"
     this.cut=true
@@ -712,7 +718,10 @@ class Excel {
     let clipboard=this.arr_selected_2d.map(r=>r.map(c=>c.data).join(",")).join("\n")
     navigator.clipboard.writeText(clipboard);
   }
-
+/**
+ * Copys a cell or set of cells
+ * @param {MouseEvent|KeyboardEvent} e 
+ */
   copy_cell = (e) => {
     this.rightclick.style.display="none"
     this.cut=true
@@ -722,7 +731,10 @@ class Excel {
     let clipboard=this.arr_selected_2d.map(r=>r.map(c=>c.data).join(",")).join("\n")
     navigator.clipboard.writeText(clipboard);
   }
-
+/**
+ * Paste value inside a cell or set of cells
+ * @param {MouseEvent|KeyboardEvent} e 
+ */
    paste_cell = (e) => {
     if(this.first)
       return
@@ -731,18 +743,17 @@ class Excel {
     if(this.arr_selected_2d.length>1){
       for (let i = 0; i < this.arr_selected_2d.length; i++) {
         for (let j = 0; j < this.arr_selected_2d[0].length; j++) {
-            this.arr2d[this.py1+i][this.px1-1+j].data=this.arr_selected_2d[i][j].data
+            this.arr2d[this.activeCell.rows+i][this.activeCell.cols+j].data=this.arr_selected_2d[i][j].data
             if(this.op_cut){
               this.arr_selected_2d[i][j].data=""
               this.first=true
             }
           }
         }
-        this.op_cut=false  
-        
+        this.op_cut=false   
       }
     else{
-        this.arr2d[this.py1][this.px1-1].data=this.arr_selected_2d[0][0].data
+        this.arr2d[this.activeCell.rows][this.activeCell.cols].data=this.arr_selected_2d[0][0].data
         if(this.op_cut){
           this.arr_selected_2d[0][0].data=""
           this.op_cut=false
@@ -751,7 +762,10 @@ class Excel {
       }
     this.render()
 }
-
+/**
+ * Delete value inside a cell or set of cells
+ * @param {MouseEvent|KeyboardEvent} e 
+ */
    graph_cell = (e) => {
     this.rightclick.style.display="none"
     this.arrayConverter()
@@ -766,7 +780,10 @@ class Excel {
     a.render()
 
   }
-
+/**
+ * Delete value inside a cell
+ * @param {MouseEvent|KeyboardEvent} e 
+ */
    sort_cell = (e) => {
       let sort=[]
       for (let i = 0; i < this.arr_selected.length; i++) {
@@ -820,14 +837,16 @@ class Excel {
   keyMove(e) { 
     if (e.shiftKey) {
       this.xscroll = true;
-    } else {
+    }else {
       this.xscroll = false;
     }
+
     if(e.target==this.textbox){
       return
     }
-    let {rows,cols} = this.activeCell;
-    
+
+    let {rows,cols} = this.activeCell; 
+
     if (e.key == "ArrowLeft") {
       if(this.arr_width.length>1 && this.textbox.style.display=="none"){
         this.arr_selected=[]
@@ -848,8 +867,10 @@ class Excel {
        
       }
     }else if (e.key == "ArrowRight") {
+      console.log("h")
       if(this.arr_width.length>1 && this.textbox.style.display=="none"){
         this.arr_selected=[]
+        console.log("ello")
       }
       if(this.activeCell.xpos+200>this.scrollX+this.canvas.width)
       {
@@ -857,6 +878,7 @@ class Excel {
       }
       this.textbox.style.display = "none";
       this.activeCell = this.arr2d[rows][cols + 1];
+      console.log(this.activeCell)
       this.activeRow=this.header1dhead[cols+1]
  
     }else if (e.key == "ArrowUp") {
@@ -898,30 +920,30 @@ class Excel {
       console.log(this.arr_selected)
       this.arr_selected.forEach((c) => (c.data = ""));
       this.activeCell.data = "";
-      this.render()
-     
-    }
-    else if (e.key == "Backspace") {
+      this.render()  
+    }else if (e.key == "Backspace") {
       this.activeCell.data = "";
       this.textbox_visible(this.activeCell)
       this.render()
-    }
-    else if (e.key == "Enter") {
+    }else if (e.key == "Enter") {
       this.textbox.style.display = "none";
       this.activeCell = this.arr2d[rows + 1][cols];
-    }
-    else if (e.ctrlKey && e.key == "c") {
+    }else if (e.ctrlKey && e.key == "c") {
       this.copy_cell()
-    }
-    else if (e.ctrlKey && e.key == "v") {
+    }else if (e.ctrlKey && e.key == "v") {
       this.paste_cell()
-    }
-    else if (e.ctrlKey && e.key == "x") {
+      return
+    }else if (e.ctrlKey && e.key == "x") {
       this.cut_cell()
     }
+
     if(e.key.match(/^\w$/)){
       this.textbox_visible(this.activeCell)
     }
+
+   this.arr_selected.push(this.activeCell)
+   
+
     !e.shiftKey &&
     this.render()
   }
@@ -1238,7 +1260,6 @@ class Excel {
     this.l2=leftX2
     this.t1=topX1
     this.t2=topX2
-
   }
 
   /**
@@ -1412,6 +1433,9 @@ class Excel {
     return pow ? this.toLetters(pow) + out : out;
   }
 
+/**
+ * Clear header, sidebar and data as necessary
+ */
   clearData(){
     this.htx.clearRect(0, 0, this.header.width, this.header.height);
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -1482,6 +1506,7 @@ class Excel {
       
     }
   }
+
 } 
 
 class Graph{
@@ -1605,3 +1630,5 @@ csv =`Sr. No.,First Name,Last Name,Age,Height,Gender,Age,Height,Gender,Age,Heigh
 25,Glo,Ter,23,191,Male,359,527,Male,695,863,Male,1031,1199,Male,1367,1535,Male,1703,1871,Male,2039
       `;
 let excel = new Excel(csv.repeat(1), document.querySelector(".container"));
+
+
