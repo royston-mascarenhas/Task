@@ -5,9 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Excel</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- <link rel="stylesheet" href="../task5/styles.css"> -->
   </head>
   <body>
-    <div class="container" id="container" style="height: 100vh; "></div>
-    <script src="./script.js"></script>
+
+  <div class="container" id="container" style="height: 100vh; "></div>
+  <script src="./script.js"></script>
+
+  <!-- <nav>
+    <img src="" alt="" />
+    <div style="flex-grow: 1"></div>
+
+    <label for="max-val"></label>
+    <input style= "padding: 10px;margin-right: 10px;";type="text" id="max-val" name="fname" placeholder="Max..."><br><br>
+
+    <label for="min-val"></label>
+    <input style= "padding: 10px;margin-right: 10px;";type="text" id="min-val" name="fname" placeholder="Min..."><br><br>
+
+    <label for="avg-val"></label>
+    <input style= "padding: 10px;margin-right: 10px;";type="text" id="avg-val" name="fname" placeholder="Average..."><br><br>
+
+    <label for="add-val"></label>
+    <input style= "padding: 10px;margin-right: 10px;";type="text" id="add-val" name="fname" placeholder="Sum..."><br><br>
+
+    <div onclick="graph()"class="home-content-upload-buttons">
+        <label for="graph">
+            <div id="graph">Graph</div>
+        </label>
+    </div>
+
+    <div class="home-content-upload-buttons">
+        <label for="file">
+            <input onchange="data(this)"type="file" id="file" accept="text/csv" class="hidden">
+            <div  >Upload
+                <i class="fa fa-lg fa-upload"></i></div>
+        </label>
+    </div>
+
+    <div class="profile-img">
+        <img src="../quantum_screen_assets/quantum_screen_assets/icons/account_circle.svg"/>
+    </div>
+</nav>
+
+<div class="hidden" id="myChart"></div>
+<!-- <div class="sheet" style="overflow-y:scroll;position: relative;">
+    <div id= "nofile">No File Found</div>
+    <input class="textbox hidden"  type="text" id="text" name="text">
+    <canvas class="canvas" id ="canvas">
+    </canvas>
+</div> -->
+  <!-- <script>
+     async function data(ele) {
+        console.log("hhy")
+         const input =ele.files[0]
+         const reader = new FileReader();
+         reader.onload = function (e) {
+            const text = e.target.result;
+            document.querySelector(".container").innerHTML=""
+            let excel = new Excel(text, document.querySelector(".container"));
+            console.log(text)
+         };
+         reader.readAsText(input);
+
+      };
+  </script> --> -->
+   
   </body>
 </html>

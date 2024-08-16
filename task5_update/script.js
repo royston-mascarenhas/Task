@@ -41,6 +41,29 @@ class Excel {
     this.render()
   }
 
+  // async upload(){
+  //   try {
+  //     const response = await fetch('http://localhost:5056/api/messages/send', {  
+  //         method: 'POST',
+  //         headers: {
+  //             'Content-Type': 'application/json'
+  //         },
+  //         body: JSON.stringify(this.arr2d)
+  //     });
+
+  //     if (response.ok) {
+  //         console.log('Data sent successfully');
+  //         alert('Data sent successfully');
+  //     } else {
+  //         console.error('Error sending data');
+  //         alert('Error sending data');
+  //     }
+  // } catch (error) {
+  //     console.error('Error:', error);
+  //     alert('Error sending data');
+  // }
+  // }
+
   /**
    * Render Function with Request Animation
    * @returns {boolean} Indicates whether busy or not
@@ -182,6 +205,7 @@ class Excel {
     emptyBox.style.display = "inline-block"
     emptyBox.style.background="#80808044"
     this.container.appendChild(emptyBox)
+
    
     this.textbox = document.createElement("input");
     this.textbox.style.display = "none";
