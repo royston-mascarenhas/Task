@@ -9,10 +9,10 @@ namespace TodoApi.Controllers
     [ApiController]
     public class FilesController : ControllerBase
     {
-        private readonly FileContext _context;
+        private readonly Context _context;
         private readonly RabbitMQService rmq=new();
 
-        public FilesController(FileContext context)
+        public FilesController(Context context)
         {
             _context = context;
         }
@@ -37,7 +37,6 @@ namespace TodoApi.Controllers
         }
 
         // PUT: api/Files/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTodoItem(long id, TodoApi.Models.File todoItem)
         {
@@ -56,15 +55,31 @@ namespace TodoApi.Controllers
         }
 
         // POST: api/Files
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<TodoApi.Models.File>> PostTodoItem(TodoApi.Models.File todoItem)
-        {
-            
-            rmq.SendMessage(ProducerRequest("POST",JsonConvert.SerializeObject(todoItem)));
-            return Created(nameof(todoItem),new {success=true});
-
-            
+        public async Task<ActionResult<TodoApi.Models.File>> PostTodoItem(TodoApi.Models.NewFile file)
+        {  
+          string csv = file.Data.Trim();
+          string[] rows = csv.Split('\n');
+          int i = 0;
+          string temp = "";
+          var newFile = file;
+            foreach (var row in rows)
+            {
+                temp +=  row+ "\n";
+                i++;
+                if (i % 1000== 0)
+                {   
+                    newFile = file;
+                    newFile.Data = temp.Trim();
+                    rmq.SendMessage(ProducerRequest("POST", JsonConvert.SerializeObject(file)));
+                    temp = "";
+                }
+            }
+            newFile = file;
+            newFile.Data = temp.Trim();
+            rmq.SendMessage(ProducerRequest("POST", JsonConvert.SerializeObject(newFile)));
+ 
+            return Created(nameof(file), new { success = true });
         }
 
         // DELETE: api/Files/5
@@ -77,8 +92,8 @@ namespace TodoApi.Controllers
                 return NotFound();
             }
 
-            rmq.SendMessage(ProducerRequest("DELETE",id.ToString()));
-
+          _context.Files.Remove(todoItem);
+           await _context.SaveChangesAsync();  
             return NoContent();
         }
 
@@ -87,11 +102,11 @@ namespace TodoApi.Controllers
             return _context.Files.Any(e => e.Id == id);
         }
 
-
         private string ProducerRequest(string s,string Data){
             var payload=new
             {
                 Type=s,
+                ObjectType="files",
                 Data
             };
             return JsonConvert.SerializeObject(payload);

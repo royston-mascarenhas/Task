@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Excel</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- <link rel="stylesheet" href="../task5/styles.css"> -->
+    <link rel="stylesheet" href="../task5/styles.css">
   </head>
   <body>
 
-  <div class="container" id="container" style="height: 100vh; "></div>
-  <script src="./script.js"></script>
+  
 
-  <!-- <nav>
+  <nav>
     <img src="" alt="" />
     <div style="flex-grow: 1"></div>
 
@@ -46,21 +45,41 @@
         <img src="../quantum_screen_assets/quantum_screen_assets/icons/account_circle.svg"/>
     </div>
 </nav>
+<div class="container" id="container" style="height: 100vh; "></div>
+  <script src="./script.js"></script>
 
 <div class="hidden" id="myChart"></div>
-<!-- <div class="sheet" style="overflow-y:scroll;position: relative;">
+<div class="sheet" style="overflow-y:scroll;position: relative;">
     <div id= "nofile">No File Found</div>
     <input class="textbox hidden"  type="text" id="text" name="text">
     <canvas class="canvas" id ="canvas">
     </canvas>
-</div> -->
-  <!-- <script>
+</div>
+  <script>
      async function data(ele) {
         console.log("hhy")
          const input =ele.files[0]
          const reader = new FileReader();
          reader.onload = function (e) {
             const text = e.target.result;
+            fetch("http://localhost:5183/api/Files", {
+              method: "POST",
+              body: JSON.stringify({
+                id: 0,
+                name: "string",
+                extension: "string",
+                progress: 0,
+                size: 0,
+                data: text,
+              }),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }).then((response) => {
+              response.json().then((data) => {
+                console.log(data);
+              });
+            });
             document.querySelector(".container").innerHTML=""
             let excel = new Excel(text, document.querySelector(".container"));
             console.log(text)
@@ -68,7 +87,7 @@
          reader.readAsText(input);
 
       };
-  </script> --> -->
+  </script>
    
   </body>
 </html>

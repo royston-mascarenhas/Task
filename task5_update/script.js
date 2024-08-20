@@ -213,7 +213,7 @@ class Excel {
     this.textbox.style.boxSizing="border-box"
 
     let header = document.createElement("canvas");
-    header.width = this.container.offsetWidth-60;
+    header.width = this.container.offsetWidth-90;
     header.height = 30;
     this.container.appendChild(header);
     this.header = header;
@@ -232,7 +232,7 @@ class Excel {
     this.textbox.style.position = "absolute";
 
     let canvas = document.createElement("canvas");
-    canvas.width = this.container.offsetWidth - 60;
+    canvas.width = this.container.offsetWidth - 90;
     canvas.height = this.container.offsetHeight - 30;
     canvas.id = "canvas";
 

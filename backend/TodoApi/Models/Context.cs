@@ -2,12 +2,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TodoApi.Models;
 
-public class FileContext : DbContext
+public class Context : DbContext
 {
-    public FileContext(DbContextOptions<FileContext> options)
+    public Context(DbContextOptions<Context> options)
         : base(options)
     {
     }
 
     public DbSet<File> Files { get; set; } = null!;
+    public DbSet<Cell> Cells { get; set; } = null!;
 }
