@@ -56,7 +56,6 @@ public class RabbitMQService : IDisposable
                                   basicProperties: null,
                                   body: body);
  
-            Console.WriteLine($" [x] Sent {message}");
         }
         catch (AlreadyClosedException ex)
         {

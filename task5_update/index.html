@@ -61,28 +61,31 @@
          const input =ele.files[0]
          const reader = new FileReader();
          reader.onload = function (e) {
-            const text = e.target.result;
-            fetch("http://localhost:5183/api/Files", {
-              method: "POST",
-              body: JSON.stringify({
-                id: 0,
-                name: "string",
-                extension: "string",
-                progress: 0,
-                size: 0,
-                data: text,
-              }),
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }).then((response) => {
-              response.json().then((data) => {
-                console.log(data);
+           const text = e.target.result;
+           for (let index = 0; index < 10; index++) {
+              fetch("http://localhost:5183/api/Files", {
+                method: "POST",
+                body: JSON.stringify({
+                  id: 0,
+                  name: input.name,
+                  extension: "csv",
+                  progress: 0,
+                  size: 0,
+                  data: text,
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }).then((response) => {
+                response.json().then((data) => {
+                  console.log(data);
+                });
               });
-            });
-            document.querySelector(".container").innerHTML=""
-            let excel = new Excel(text, document.querySelector(".container"));
-            console.log(text)
+              
+              
+            }
+            // document.querySelector(".container").innerHTML=""
+            // let excel = new Excel(text, document.querySelector(".container"));
          };
          reader.readAsText(input);
 

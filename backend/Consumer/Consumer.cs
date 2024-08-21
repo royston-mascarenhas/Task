@@ -10,7 +10,9 @@ using System.Diagnostics;
 class Program
 {
   private static readonly string _connectionString = "Server=localhost;Database=exceldb;User ID=root;Password=root;";
+
   private static Stopwatch stopWatch = new Stopwatch();
+
   static async Task Main(string[] args)
   {
     var factory = new ConnectionFactory() { HostName = "localhost" };
@@ -20,6 +22,7 @@ class Program
     channel.QueueDeclare(queue: "queue", durable: true, exclusive: false, autoDelete: false, arguments: null);
     var consumer = new EventingBasicConsumer(channel);
     int i = 0;
+    
     consumer.Received += async (model, ea) =>
     {
       Console.WriteLine(++i);
@@ -35,6 +38,7 @@ class Program
     Console.WriteLine("Press [enter] to exit.");
     Console.ReadLine();
   }
+  
   private static async Task InsertIntoDatabaseAsync(File file)
   {
     var query = "INSERT INTO files (Name,Extension,Size) VALUES (@Name,@Extension,@Size)";
@@ -46,6 +50,7 @@ class Program
     command.Parameters.AddWithValue("@Size", file.Size);
     await command.ExecuteNonQueryAsync();
   }
+  
   private static async Task InsertCell(Cell cell)
   {
     var query = "INSERT INTO cells (id,row,col,data,bold,italic,underline,font,fontsize,align,file) VALUES (@Id,@Row,@Col,@Data,@Bold,@Italic,@Underline,@Font,@FontSize,@Align,@File)";
@@ -65,6 +70,7 @@ class Program
     command.Parameters.AddWithValue("@File", cell.File);
     await command.ExecuteNonQueryAsync();
   }
+  
   static async Task<int> fileExists(string name)
   {
     using var connection = new MySqlConnection(_connectionString);
@@ -73,7 +79,6 @@ class Program
     using var command = new MySqlCommand("SELECT * FROM files WHERE name = @name", connection);
     command.Parameters.AddWithValue("@name", name);
     using var reader = await command.ExecuteReaderAsync();
-
     int fileId = -1;
 
     if (reader.HasRows)
@@ -83,58 +88,27 @@ class Program
         fileId = reader.GetInt32(0);
       }
     }
-
     connection.Close();
-
     return fileId;
   }
-  private static async Task InsertFile(string name, string extension, int size, string csv)
-  {
-    int fileId = await fileExists(name);
-
-    if (fileId.Equals(-1))
-    {
-      try
-      {
-        using var connection = new MySqlConnection(_connectionString);
-        await connection.OpenAsync();
-        Console.WriteLine("Inserting into DB...");
-        using var icommand = new MySqlCommand("INSERT INTO files (name, size, extension) VALUES (@name, @size, @extension)", connection);
-        icommand.Parameters.AddWithValue("@name", name);
-        icommand.Parameters.AddWithValue("@size", size);
-        icommand.Parameters.AddWithValue("@extension", extension);
-        await icommand.ExecuteNonQueryAsync();
-
-        fileId = (int)icommand.LastInsertedId;
-
-        Console.WriteLine("Insertion successful");
-
-        connection.Close();
-      }
-      catch (Exception ex)
-      {
-        Console.WriteLine($"Error: {ex.Message}");
-      }
-    }
-
+ 
+  private static async Task InsertFile(NewFile file)
+  { 
     StringBuilder queryBuilder =new StringBuilder();
     queryBuilder.Append("INSERT INTO cells (`row`, col, data, file) VALUES ");
-    
-
-    int i = 0, j = 0;
-    foreach (var row in csv.Split('\n'))
+    int i =file.StartRow, j = 0;
+    foreach (var row in file.Data.Split('\n'))
     {
       ++i;
       foreach (var col in row.Split(','))
       {
         ++j;
-        queryBuilder.Append("(" + i + ", " + j + ", '" + secureData(col) + "', " + fileId + "),");
+        queryBuilder.Append("(" + i + ", " + j + ", '" + secureData(col) + "', " + file.Id + "),");
       }
+      j=0;
     }
     string query = queryBuilder.ToString().Remove(queryBuilder.Length - 1);
     insertQuery(query);
-
-   
   }
 
   static async Task insertQuery(string query)
@@ -145,6 +119,7 @@ class Program
       await ecommand.ExecuteNonQueryAsync();
       sconnection.Close();
   }
+  
   private static async Task RequestHandler(string message)
   {
     Request request = JsonConvert.DeserializeObject<Request>(message);
@@ -153,7 +128,7 @@ class Program
 
     if (objtype == "files")
     {
-      File file = JsonConvert.DeserializeObject<File>(request.Data);
+      NewFile file = JsonConvert.DeserializeObject<NewFile>(request.Data);
       if (type == "PUT")
       {
 
@@ -161,9 +136,9 @@ class Program
       if (type == "POST")
       {
         stopWatch.Start();
-        await InsertFile(file.Name, file.Extension, (int)file.Size, file.Data);
-        Console.WriteLine(stopWatch);
+        await InsertFile(file);
         stopWatch.Stop();
+        Console.WriteLine($"Elapsed time: {stopWatch} seconds");
         // stopWatch.Reset();
       }
     }
@@ -178,11 +153,14 @@ class Program
 
       }
     }
+
   }
+  
   private static string secureData(string data)
   {
     return MySqlHelper.EscapeString(data);
   }
+
 }
 
 public class Request
@@ -202,6 +180,13 @@ public class File
   public long Size { get; set; }
   public int Progress { get; set; }
   public string? Data { get; set; }
+}
+
+public class NewFile:File
+{
+    public string? Data { get; set; }
+
+    public int StartRow{ get; set;}
 }
 
 public class Cell

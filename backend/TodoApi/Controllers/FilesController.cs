@@ -56,30 +56,41 @@ namespace TodoApi.Controllers
 
         // POST: api/Files
         [HttpPost]
-        public async Task<ActionResult<TodoApi.Models.File>> PostTodoItem(TodoApi.Models.NewFile file)
+        public ActionResult<TodoApi.Models.File> PostTodoItem(TodoApi.Models.NewFile Datafile)
         {  
-          string csv = file.Data.Trim();
-          string[] rows = csv.Split('\n');
-          int i = 0;
-          string temp = "";
-          var newFile = file;
-            foreach (var row in rows)
+
+          TodoApi.Models.File file=new()
+          {
+            Name=Datafile.Name,
+            Extension=Datafile.Extension,
+            Size=Datafile.Size,
+            Progress=0,
+          };
+
+          _context.Files.Add(file);
+          _context.SaveChanges();
+
+          long lastInserted=_context.Files.Max(x=>x.Id);
+          Datafile.Id=lastInserted;
+
+
+            string csv = Datafile.Data.Trim();
+            int chunkSize = 10000;
+            var chunks = csv.Split("\n")
+                .Select((item, index) => new { Item = item, Index = index })
+                .GroupBy(x => x.Index / chunkSize)
+                .Select(g => g.Select(x => x.Item).ToList())
+                .ToList();
+
+            foreach (var chunk in chunks)
             {
-                temp +=  row+ "\n";
-                i++;
-                if (i % 1000== 0)
-                {   
-                    newFile = file;
-                    newFile.Data = temp.Trim();
-                    rmq.SendMessage(ProducerRequest("POST", JsonConvert.SerializeObject(file)));
-                    temp = "";
-                }
+                Datafile.Data = string.Join("\n", chunk);
+                rmq.SendMessage(ProducerRequest("POST", JsonConvert.SerializeObject(Datafile)));
+                Datafile.StartRow+=chunk.Count+1;
+
             }
-            newFile = file;
-            newFile.Data = temp.Trim();
-            rmq.SendMessage(ProducerRequest("POST", JsonConvert.SerializeObject(newFile)));
  
-            return Created(nameof(file), new { success = true });
+            return Created(nameof(Datafile), new { success = true });
         }
 
         // DELETE: api/Files/5

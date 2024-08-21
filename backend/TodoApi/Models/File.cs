@@ -12,4 +12,6 @@ public class File
 public class NewFile:File
 {
     public string? Data { get; set; }
+
+    public int StartRow{ get; set;}
 }
