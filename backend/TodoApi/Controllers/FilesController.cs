@@ -87,7 +87,6 @@ namespace TodoApi.Controllers
                 Datafile.Data = string.Join("\n", chunk);
                 rmq.SendMessage(ProducerRequest("POST", JsonConvert.SerializeObject(Datafile)));
                 Datafile.StartRow+=chunk.Count+1;
-
             }
  
             return Created(nameof(Datafile), new { success = true });
@@ -104,8 +103,8 @@ namespace TodoApi.Controllers
             }
 
           _context.Files.Remove(todoItem);
-           await _context.SaveChangesAsync();  
-            return NoContent();
+          await _context.SaveChangesAsync();  
+          return NoContent();
         }
 
         private bool TodoItemExists(long id)

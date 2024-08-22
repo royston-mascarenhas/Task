@@ -153,7 +153,6 @@ class Program
 
       }
     }
-
   }
   
   private static string secureData(string data)
