@@ -49,8 +49,7 @@ namespace TodoApi.Controllers
                 {
                     return NotFound();
                 }
-
-            rmq.SendMessage(ProducerRequest("PUT",JsonConvert.SerializeObject(todoItem)));
+            
             return Ok(JsonConvert.SerializeObject(todoItem));
         }
 
@@ -72,6 +71,7 @@ namespace TodoApi.Controllers
 
           long lastInserted=_context.Files.Max(x=>x.Id);
           Datafile.Id=lastInserted;
+
 
 
             string csv = Datafile.Data.Trim();

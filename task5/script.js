@@ -164,14 +164,14 @@ class Excel {
     for (let i = 0; i < max_row; i++) {
       counter = 0;
       let data1d = [];
-      for (let j = 0; j < max_col; j++) {
-        let d = {};
+      for (let j = 0; j < max_col+1; j++) {
+        let d = {...data[i * (max_col) + j]};
         d["xpos"] = counter;
         d["ypos"] = i * 30;
         d["width"] = this.arr_width[j];
         d["height"] = 30;
         d["color"] = "#9A9A9AFF";
-        d["data"] = data[i * (max_col) + j]['data'];
+        d["data"] = data[i * (max_col+1) + j]['data'];
         d["lineWidth"] = 1;
         d["rows"] = i;
         d["cols"] = j;
@@ -902,7 +902,22 @@ class Excel {
    */
   textset(event, canvas) {
     var t1 = event.target.value;
-    this.cell.data = t1;
+
+    // this.cell.data = t1;
+   fetch("http://localhost:5183/api/Cells/"+this.cell.id,{
+    method:"PUT",
+    body:JSON.stringify({
+      ...this.cell,
+      data: t1
+    }),
+    headers:{
+      "content-type":"application/json"
+    }
+   }).then(response=>{
+    response.json().then(o =>{
+      this.cell.data=o.Data
+    })
+   })
   }
 
   /**

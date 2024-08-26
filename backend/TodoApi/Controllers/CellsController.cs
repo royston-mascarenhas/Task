@@ -50,7 +50,9 @@ namespace TodoApi.Controllers
                     return NotFound();
                 }
 
-            rmq.SendMessage(ProducerRequest("PUT",JsonConvert.SerializeObject(cell)));
+            _context.Entry(cell).State=EntityState.Modified;
+            await _context.SaveChangesAsync();
+
             return Ok(JsonConvert.SerializeObject(cell));
         }
 

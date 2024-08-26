@@ -62,6 +62,7 @@ async function data(ele) {
    const input =ele.files[0]
    const reader = new FileReader();
    reader.onload = function (e) {
+
      const text = e.target.result;
      for (let index = 0; index < 1; index++){
         fetch("http://localhost:5183/api/Files",{

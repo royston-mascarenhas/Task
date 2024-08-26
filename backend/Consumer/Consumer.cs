@@ -96,7 +96,7 @@ class Program
   { 
     StringBuilder queryBuilder =new StringBuilder();
     queryBuilder.Append("INSERT INTO cells (`row`, col, data, file) VALUES ");
-    int i =file.StartRow, j = 0;
+    int i =file.StartRow-1, j = -1;
     foreach (var row in file.Data.Split('\n'))
     {
       ++i;
@@ -105,7 +105,7 @@ class Program
         ++j;
         queryBuilder.Append("(" + i + ", " + j + ", '" + secureData(col) + "', " + file.Id + "),");
       }
-      j=0;
+      j=-1;
     }
     string query = queryBuilder.ToString().Remove(queryBuilder.Length - 1);
     insertQuery(query);
