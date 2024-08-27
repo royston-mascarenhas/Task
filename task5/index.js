@@ -38,7 +38,6 @@ function fetchFile(){
 
   $(".file_child").click(function(){
     const id=$(this).attr("data-id")
-    
   })
 }
 $(function () {

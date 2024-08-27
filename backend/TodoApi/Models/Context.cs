@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TodoApi.Models;
 
+//inherit DbContext
 public class Context : DbContext
 {
     public Context(DbContextOptions<Context> options)

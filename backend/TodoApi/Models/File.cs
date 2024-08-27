@@ -9,6 +9,7 @@ public class File
     public int Progress { get; set; }
 }
 
+//inherit class File
 public class NewFile:File
 {
     public string? Data { get; set; }

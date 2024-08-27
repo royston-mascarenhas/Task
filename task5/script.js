@@ -23,6 +23,7 @@ class Excel {
    * @param {HTMLDivElement} container wrapper for Excel
    */
   constructor(data, container) {
+    this.extdata=[];
     // this.csv = csv;
     this.lineDashOffset = 0;
     this.container = container;
@@ -39,6 +40,8 @@ class Excel {
     this.dy = 0;
     this.first = true;
     this.col_selection = false;
+    this.take=5000;
+    this.skip=0;
     this.render();
   }
 
@@ -157,6 +160,7 @@ class Excel {
     this.arr2d = [];
 
     let max_col = Math.max(...data.map((d) => d.col));
+    this.max_col=max_col
     console.log(max_col);
     let max_row = Math.max(...data.map((d) => d.row));
     console.log(max_row);
@@ -1355,11 +1359,26 @@ class Excel {
     this.render();
   }
 
+  async fetchCells(skip) {
+    // http://localhost:5183/api/Cells/file/141/0/10
+    fetch("http://localhost:5183/api/Cells/file/141/"+skip).then(async (response) => {
+      this.extdata = await response.json();
+      console.log(this.extdata)
+    });
+}
   /**
    * Used for creation and extention of Data
    * @param {number} count
    */
   extendData(count, axis) {
+    this.skip+=2000
+
+    // let max_col = Math.max(...this.extdata.map((d) => d.col));
+    // console.log(max_col);
+    // let max_row = Math.max(...this.extdata.map((d) => d.row));
+    // console.log(max_row);
+
+    let cell=this.fetchCells(this.skip)
     if (axis === 1) {
       this.arr2d.forEach((row, i) => {
         let prevColumns = row.length;
@@ -1395,7 +1414,7 @@ class Excel {
           rectData["width"] = this.arr_width[j];
           rectData["height"] = 30;
           rectData["color"] = "#9A9A9AFF";
-          rectData["data"] = "";
+          rectData["data"] = this.extdata[(i-prevRows)*(this.max_col+1)+j]['data'];
           rectData["lineWidth"] = 1;
           rectData["rows"] = i;
           rectData["cols"] = j;

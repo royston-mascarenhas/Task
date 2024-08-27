@@ -20,7 +20,18 @@ namespace TodoApi.Controllers
         [HttpGet("file/{id}")]
         public async Task<ActionResult<IEnumerable<TodoApi.Models.Cell>>> GetCells(long id)
         {
-            return await _context.Cells.Where(c=>c.File==id).ToListAsync();
+            return await _context.Cells.Where(c=>c.File==id).Skip(0).Take(2000).ToListAsync();
+        }
+
+        [HttpGet("file/{id}/{skip}")]
+        public async Task<ActionResult<IEnumerable<TodoApi.Models.Cell>>> GetCells(long id, int skip)
+        {
+            return await _context.Cells
+                .Where(c => c.File == id)
+                // .OrderBy(c => c.Id) // Assuming you have an 'Id' or a similar property to order by
+                .Skip(skip)
+                .Take(2000)
+                .ToListAsync();
         }
 
         // GET: api/Files/5

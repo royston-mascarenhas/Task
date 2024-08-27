@@ -71,9 +71,7 @@ namespace TodoApi.Controllers
 
           long lastInserted=_context.Files.Max(x=>x.Id);
           Datafile.Id=lastInserted;
-
-
-
+          
             string csv = Datafile.Data.Trim();
             int chunkSize = 10000;
             var chunks = csv.Split("\n")
