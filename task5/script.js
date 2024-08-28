@@ -22,15 +22,21 @@ class Excel {
    * @param {string} csv CSV is string
    * @param {HTMLDivElement} container wrapper for Excel
    */
-  constructor(data, container) {
+  constructor(id, container) {
     this.extdata=[];
+    this.arr2d=[];
     // this.csv = csv;
+    this.file_id=id
     this.lineDashOffset = 0;
     this.container = container;
     this.header1dhead = [];
     this.header1dside = [];
     this.createcanvas();
-    this.jsonToExcel(data);
+    // this.jsonToExcel(data);
+    this.extendData(100,1)
+    this.extendData(100,2)
+    this.page_index=1;
+    this.pagination();
     this.math_sum = 0;
     this.scrollX = 0;
     this.scrollY = 0;
@@ -40,9 +46,24 @@ class Excel {
     this.dy = 0;
     this.first = true;
     this.col_selection = false;
-    this.take=5000;
-    this.skip=0;
+    this.take=2000;
+    this.skip=2000;
+    
     this.render();
+  }
+
+  pagination(){
+    let cell;
+    fetch("http://localhost:5183/api/Cells/file/"+this.file_id+"/"+this.page_index++).then(response=>response.json()).then(data=>{
+      data.forEach(cell=>{
+        this.arr2d[cell.row][cell.col]={...this.arr2d[cell.row][cell.col],...cell}
+       
+      })
+      this.activeCell=this.arr2d[0][0];
+      this.arr_selected = [this.activeCell];
+      this.render()
+    })
+    
   }
 
   // async upload(){
@@ -906,9 +927,10 @@ class Excel {
    */
   textset(event, canvas) {
     var t1 = event.target.value;
-
+    console.log(this.cell)
+    this.cell.data=t1
     // this.cell.data = t1;
-   fetch("http://localhost:5183/api/Cells/"+this.cell.id,{
+   fetch("http://localhost:5183/api/Cells/"+this.cell["id"],{
     method:"PUT",
     body:JSON.stringify({
       ...this.cell,
@@ -1343,6 +1365,7 @@ class Excel {
     this.t2 = topX2;
   }
 
+  
   /**
    * Used to Identify Wheel Event for scrolling
    * @param {WheelEvent} event
@@ -1359,26 +1382,48 @@ class Excel {
     this.render();
   }
 
-  async fetchCells(skip) {
-    // http://localhost:5183/api/Cells/file/141/0/10
-    fetch("http://localhost:5183/api/Cells/file/141/"+skip).then(async (response) => {
-      this.extdata = await response.json();
-      console.log(this.extdata)
-    });
-}
+ 
   /**
    * Used for creation and extention of Data
    * @param {number} count
    */
   extendData(count, axis) {
-    this.skip+=2000
+    
+    // if(!this.dataready){
+    //   return
+    // }
 
+    
     // let max_col = Math.max(...this.extdata.map((d) => d.col));
     // console.log(max_col);
     // let max_row = Math.max(...this.extdata.map((d) => d.row));
     // console.log(max_row);
+    // if(this.first_fetch){
+    //   this.fetchCells(this.skip)
+    //   this.skip+=2000
+    // }
+    // this.first_fetch=true
 
-    let cell=this.fetchCells(this.skip)
+    if(this.arr2d.length==0){
+      let d={}
+        d["xpos"] = 0;
+        d["ypos"] = 0;
+        d["width"] = 100;
+        d["height"] = 30;
+        d["color"] = "#9A9A9AFF";
+        d["data"] ="";
+        d["lineWidth"] = 1;
+        d["row"] = 0;
+        d["align"]="LEFT";
+        d["col"] = 0;
+        d["bold"]=false
+          d["italic"]=false
+          d["underline"]=false
+          d["font"]="Arial"
+        this.arr2d.push([d]);
+        this.activeCell=d;
+        this.arr_selected = [this.activeCell];
+      }
     if (axis === 1) {
       this.arr2d.forEach((row, i) => {
         let prevColumns = row.length;
@@ -1391,9 +1436,14 @@ class Excel {
           rectData["width"] = 100;
           this.arr_width.push(100);
           rectData["height"] = 30;
+          rectData["bold"]=false
+          rectData["italic"]=false
+          rectData["underline"]=false
+          rectData["font"]="Arial"
           rectData["color"] = "#9A9A9AFF";
           rectData["data"] = "";
           rectData["lineWidth"] = 1;
+          rectData["align"]="LEFT";
           rectData["rows"] = i;
           rectData["cols"] = j;
           row.push(rectData);
@@ -1404,17 +1454,25 @@ class Excel {
       let prevRows = this.arr2d.length;
       for (let i = prevRows; i < prevRows + count; i++) {
         let row = this.arr2d[i - 1];
+        // console.log(this.arr2d[i - 1])
         let extend1d = [];
+        //console.log(this.arr2d[i-1])
         for (let j = 0; j < row.length; j++) {
           let left = row[j].xpos;
           let top = row[j].ypos + row[j].height;
           let rectData = {};
-          rectData["xpos"] = left;
+          rectData["xpos"] = left; 
           rectData["ypos"] = top;
           rectData["width"] = this.arr_width[j];
           rectData["height"] = 30;
           rectData["color"] = "#9A9A9AFF";
-          rectData["data"] = this.extdata[(i-prevRows)*(this.max_col+1)+j]['data'];
+          rectData["data"] ="";
+          rectData["align"]="LEFT";
+          rectData["bold"]=false
+          rectData["italic"]=false
+          rectData["underline"]=false
+          rectData["font"]="Arial"
+          //this.extdata[(i-prevRows)*(this.max_col+1)+j]['data']
           rectData["lineWidth"] = 1;
           rectData["rows"] = i;
           rectData["cols"] = j;
@@ -1427,6 +1485,7 @@ class Excel {
         }
         this.extendSidebar(count);
       }
+      
     }
   }
 
@@ -1568,9 +1627,12 @@ class Excel {
     }
     if (Math.abs(finalRow - this.arr2d.length) < 50) {
       this.extendData(100, 2);
+      this.pagination()
     }
     if (Math.abs(initialCol - this.arr2d[0].length) < 50) {
       this.extendData(100, 1);
+      console.log("x")
+      
     }
     this.clearData();
     for (
@@ -1687,7 +1749,5 @@ class Graph {
   }
 }
 const id=new URL(window.location.href).searchParams.get("id")
-fetch("http://localhost:5183/api/Cells/file/"+id).then(async (response) => {
-  data = await response.json();
-  let excel = new Excel(data, document.querySelector(".container"));
-});
+let excel = new Excel(id, document.querySelector(".container"));
+

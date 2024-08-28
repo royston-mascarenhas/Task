@@ -22,17 +22,43 @@ namespace TodoApi.Controllers
         {
             return await _context.Cells.Where(c=>c.File==id).Skip(0).Take(2000).ToListAsync();
         }
-
-        [HttpGet("file/{id}/{skip}")]
-        public async Task<ActionResult<IEnumerable<TodoApi.Models.Cell>>> GetCells(long id, int skip)
+        [HttpGet("file/{id}/{page}")]
+        public async Task<ActionResult<IEnumerable<TodoApi.Models.Cell>>> GetCells(long id, long page)
         {
-            return await _context.Cells
-                .Where(c => c.File == id)
-                // .OrderBy(c => c.Id) // Assuming you have an 'Id' or a similar property to order by
-                .Skip(skip)
-                .Take(2000)
+            // Validate page parameter
+            if (page <= 0)
+            {
+                return BadRequest("Page number must be greater than zero.");
+            }
+
+            // Constants for pagination
+            const int pageSize = 100;
+            long startRow = (page - 1) * pageSize;
+            long endRow = startRow + pageSize;
+
+            // Perform the query with filtering and pagination
+            var cells = await _context.Cells
+                .AsNoTracking()
+                .Where(c => c.File == id && c.Row >= startRow && c.Row < endRow)
+                .OrderBy(c => c.Row)
+                .Select(c => new { c.Id, c.Row, c.File, c.Col,c.Data }) // Select only required columns
                 .ToListAsync();
+
+            return Ok(cells);
         }
+
+
+
+        // [HttpGet("file/{id}/{skip}")]
+        // public async Task<ActionResult<IEnumerable<TodoApi.Models.Cell>>> GetCells(long id, int skip)
+        // {
+        //     return await _context.Cells
+        //         .Where(c => c.File == id)
+        //         // .OrderBy(c => c.Id) // Assuming you have an 'Id' or a similar property to order by
+        //         .Skip(skip)
+        //         .Take(2000)
+        //         .ToListAsync();
+        // }
 
         // GET: api/Files/5
         [HttpGet("{id}")]
