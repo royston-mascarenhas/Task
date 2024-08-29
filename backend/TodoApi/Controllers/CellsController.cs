@@ -99,12 +99,19 @@ namespace TodoApi.Controllers
         
         public async Task<ActionResult<TodoApi.Models.Cell>> PostCell(TodoApi.Models.Cell cell)
         {
-            
-            rmq.SendMessage(ProducerRequest("POST",JsonConvert.SerializeObject(cell)));
-            return Created(nameof(cell),new {success=true});
-
+             if (cell.Id == -1)
+            {
+                cell.Id = _context.Cells.Max(x => x.Id) + 1;
+                _context.Cells.Add(cell);
+                _context.SaveChanges();
+                return cell;
+            }
+            _context.Cells.Add(cell);
+            _context.SaveChanges();
+            return cell;
             
         }
+        
 
         // DELETE: api/Files/5
         [HttpDelete("{id}")]

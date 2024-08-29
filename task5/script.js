@@ -788,16 +788,27 @@ class Excel {
     }
     this.rightclick.style.background = "white";
   }
+
   /**
    * Delete value inside a cell or set of cells
-   * @param {MouseEvent|KeyboardEvent} e
+   * @param {MouseEvent|KeyboardEvent} e       
    */
   delete_cell = (e) => {
     this.rightclick.style.display = "none";
-    this.arr_selected.forEach((c) => (c.data = ""));
     this.activeCell.data = "";
+    this.arr_selected.forEach((c) => {
+      c.data = "";
+      fetch(`http://localhost:5183/api/Cells/${c.id}`, {
+        method: "DELETE",
+      }).then(response => {
+        response.json().then(o => {
+          c.data = "";
+        });
+      });
+    });
     this.render();
   };
+
   /**
    * Cuts  a cell or set of cells
    * @param {MouseEvent|KeyboardEvent} e
@@ -814,6 +825,7 @@ class Excel {
       .join("\n");
     navigator.clipboard.writeText(clipboard);
   };
+
   /**
    * Copys a cell or set of cells
    * @param {MouseEvent|KeyboardEvent} e
@@ -829,13 +841,13 @@ class Excel {
       .join("\n");
     navigator.clipboard.writeText(clipboard);
   };
+
   /**
    * Paste value inside a cell or set of cells
    * @param {MouseEvent|KeyboardEvent} e
    */
   paste_cell = (e) => {
     if (this.first) return;
-
     this.rightclick.style.display = "none";
 
     if (this.arr_selected_2d.length > 1) {
@@ -843,6 +855,7 @@ class Excel {
         for (let j = 0; j < this.arr_selected_2d[0].length; j++) {
           this.arr2d[this.activeCell.rows + i][this.activeCell.cols + j].data =
             this.arr_selected_2d[i][j].data;
+            
           if (this.op_cut) {
             this.arr_selected_2d[i][j].data = "";
             this.first = true;
@@ -854,6 +867,7 @@ class Excel {
       this.arr2d[this.activeCell.rows][this.activeCell.cols].data =
         this.arr_selected_2d[0][0].data;
       if (this.op_cut) {
+        
         this.arr_selected_2d[0][0].data = "";
         this.op_cut = false;
         this.first = true;
@@ -861,6 +875,9 @@ class Excel {
     }
     this.render();
   };
+
+
+
   /**
    * Delete value inside a cell or set of cells
    * @param {MouseEvent|KeyboardEvent} e
@@ -929,21 +946,42 @@ class Excel {
     var t1 = event.target.value;
     console.log(this.cell)
     this.cell.data=t1
-    // this.cell.data = t1;
-   fetch("http://localhost:5183/api/Cells/"+this.cell["id"],{
-    method:"PUT",
-    body:JSON.stringify({
-      ...this.cell,
-      data: t1
-    }),
-    headers:{
-      "content-type":"application/json"
+
+    if(this.cell.id!==-1){
+      fetch("http://localhost:5183/api/Cells/"+this.cell["id"],{
+        method:"PUT",
+        body:JSON.stringify({
+          ...this.cell,
+          data: t1
+        }),
+        headers:{
+          "content-type":"application/json"
+        }
+       }).then(response=>{
+        response.json().then(o =>{
+          this.cell.data=o.Data
+        })
+       })
+    }else{
+      fetch("http://localhost:5183/api/Cells/",{
+        method:"POST",
+        body:JSON.stringify({
+          ...this.cell,
+          data: t1
+        }),
+        headers:{
+          "content-type":"application/json"
+        }
+       }).then(response=>{
+        response.json().then(o =>{
+          this.cell.data=o["data"]
+          this.cell.id=o.id
+        })
+       })
     }
-   }).then(response=>{
-    response.json().then(o =>{
-      this.cell.data=o.Data
-    })
-   })
+    
+    // this.cell.data = t1;
+   
   }
 
   /**
@@ -1382,28 +1420,11 @@ class Excel {
     this.render();
   }
 
- 
   /**
    * Used for creation and extention of Data
    * @param {number} count
    */
   extendData(count, axis) {
-    
-    // if(!this.dataready){
-    //   return
-    // }
-
-    
-    // let max_col = Math.max(...this.extdata.map((d) => d.col));
-    // console.log(max_col);
-    // let max_row = Math.max(...this.extdata.map((d) => d.row));
-    // console.log(max_row);
-    // if(this.first_fetch){
-    //   this.fetchCells(this.skip)
-    //   this.skip+=2000
-    // }
-    // this.first_fetch=true
-
     if(this.arr2d.length==0){
       let d={}
         d["xpos"] = 0;
@@ -1416,6 +1437,8 @@ class Excel {
         d["row"] = 0;
         d["align"]="LEFT";
         d["col"] = 0;
+        d["id"]=-1;
+        d["file"]=this.file_id;
         d["bold"]=false
           d["italic"]=false
           d["underline"]=false
@@ -1437,6 +1460,8 @@ class Excel {
           this.arr_width.push(100);
           rectData["height"] = 30;
           rectData["bold"]=false
+          rectData["id"]=-1;
+          rectData["file"]=this.file_id;
           rectData["italic"]=false
           rectData["underline"]=false
           rectData["font"]="Arial"
@@ -1446,6 +1471,8 @@ class Excel {
           rectData["align"]="LEFT";
           rectData["rows"] = i;
           rectData["cols"] = j;
+          rectData["row"] = i;
+          rectData["col"] = j;
           row.push(rectData);
         }
       });
@@ -1454,9 +1481,7 @@ class Excel {
       let prevRows = this.arr2d.length;
       for (let i = prevRows; i < prevRows + count; i++) {
         let row = this.arr2d[i - 1];
-        // console.log(this.arr2d[i - 1])
         let extend1d = [];
-        //console.log(this.arr2d[i-1])
         for (let j = 0; j < row.length; j++) {
           let left = row[j].xpos;
           let top = row[j].ypos + row[j].height;
@@ -1469,13 +1494,17 @@ class Excel {
           rectData["data"] ="";
           rectData["align"]="LEFT";
           rectData["bold"]=false
+          rectData["id"]=-1;
+          rectData["file"]=this.file_id;
+
           rectData["italic"]=false
           rectData["underline"]=false
           rectData["font"]="Arial"
-          //this.extdata[(i-prevRows)*(this.max_col+1)+j]['data']
           rectData["lineWidth"] = 1;
           rectData["rows"] = i;
           rectData["cols"] = j;
+          rectData["row"] = i;
+          rectData["col"] = j;
           extend1d.push(rectData);
         }
         this.arr2d.push(extend1d);
