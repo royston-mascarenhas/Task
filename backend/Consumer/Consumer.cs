@@ -13,6 +13,8 @@ class Program
 
   private static Stopwatch stopWatch = new Stopwatch();
 
+
+
   static async Task Main(string[] args)
   {
     var factory = new ConnectionFactory() { HostName = "localhost" };
@@ -108,15 +110,16 @@ class Program
       j=-1;
     }
     string query = queryBuilder.ToString().Remove(queryBuilder.Length - 1);
-    insertQuery(query);
+     insertQuery(query,file);
   }
 
-  static async Task insertQuery(string query)
+  static async Task insertQuery(string query,File file)
   {
       using var sconnection = new MySqlConnection(_connectionString);
       await sconnection.OpenAsync();
       using var ecommand = new MySqlCommand(query, sconnection);
       await ecommand.ExecuteNonQueryAsync();
+      UpdateProgress(file.Progress,file.Id);
       sconnection.Close();
   }
   
@@ -125,6 +128,7 @@ class Program
     Request request = JsonConvert.DeserializeObject<Request>(message);
     string objtype = request.ObjectType;
     string type = request.Type;
+
 
     if (objtype == "files")
     {
@@ -136,7 +140,7 @@ class Program
       if (type == "POST")
       {
         stopWatch.Start();
-        await InsertFile(file);
+        InsertFile(file);
         stopWatch.Stop();
         Console.WriteLine($"Elapsed time: {stopWatch} seconds");
         // stopWatch.Reset();
@@ -159,6 +163,21 @@ class Program
   {
     return MySqlHelper.EscapeString(data);
   }
+
+  static async System.Threading.Tasks.Task UpdateProgress(long progress,long id)
+    {
+        using var sconnection = new MySqlConnection(_connectionString);
+        {
+            await sconnection.OpenAsync();
+            var query = "UPDATE files SET progress = progress + @Progress WHERE id = @Id";
+            using (var command = new MySqlCommand(query, sconnection))
+            {
+                command.Parameters.AddWithValue("@Progress",progress);
+                command.Parameters.AddWithValue("@Id",id);
+                await command.ExecuteNonQueryAsync();
+            }
+        }
+    }
 
 }
 

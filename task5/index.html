@@ -30,7 +30,7 @@
           </button>
 
           <label for="file">
-            <input type="file" id="file" accept="text/csv" class="hidden" onchange="data(this)"/>
+            <input type="file" id="file" accept="text/csv" class="hidden" onchange="data(this);"/>
             <div class="upload">Upload <i class="fa fa-lg fa-upload"></i></div>
           </label>
         </div>
@@ -81,6 +81,14 @@
         </div>
       </div>
     </div>
+
+
+  <div class="progress-container" id="progress-container">
+    <div class="progress-bar">
+        <div class="progress-bar-inner"></div>
+    </div>
+    <div class="progress-text">Uploading file...</div>
+  </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="./index.js"></script>

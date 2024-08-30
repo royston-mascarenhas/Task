@@ -1,4 +1,5 @@
 let list = [];
+let x=0;
 function createFileCard(Name, Size,Id) {
   const file_card = `<div class="index-file-child" style="display: flex">
                 <img src="./eximg.PNG" />
@@ -81,6 +82,7 @@ async function data(ele) {
           response.json().then((data) => {
             console.log(data);
             fetchFile()
+            showProgress(data['Id'])
           });
         });        
       }
@@ -90,5 +92,22 @@ async function data(ele) {
    reader.readAsText(input);
 
 };
+
+function showProgress(file_id) {
+ 
+  const progressContainer = document.getElementById('progress-container');
+  progressContainer.style.display = 'flex';
+  fetch('http://localhost:5183/api/Files/'+file_id).then(response=>response.json()).then(x=>{
+    document.querySelector('.progress-bar-inner').style.width=x.progress+"%";
+    if(x.progress<100)
+    showProgress(file_id)
+    else{
+      document.querySelector('.progress-container').style.display="none";
+      document.querySelector('.progress-bar-inner').style.width="0%";
+
+    }
+   
+  })
+}
 
 

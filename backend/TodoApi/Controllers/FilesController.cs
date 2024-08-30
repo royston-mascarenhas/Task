@@ -80,14 +80,17 @@ namespace TodoApi.Controllers
                 .Select(g => g.Select(x => x.Item).ToList())
                 .ToList();
 
+           
             foreach (var chunk in chunks)
             {
                 Datafile.Data = string.Join("\n", chunk);
+                Datafile.Progress=100/chunks.Count+1;
+                Console.WriteLine("Inserted");
                 rmq.SendMessage(ProducerRequest("POST", JsonConvert.SerializeObject(Datafile)));
                 Datafile.StartRow+=chunk.Count+1;
             }
  
-            return Created(nameof(Datafile), new { success = true });
+            return Created(nameof(Datafile),JsonConvert.SerializeObject(Datafile));
         }
 
         // DELETE: api/Files/5
@@ -109,7 +112,6 @@ namespace TodoApi.Controllers
         {
             return _context.Files.Any(e => e.Id == id);
         }
-
         private string ProducerRequest(string s,string Data){
             var payload=new
             {
