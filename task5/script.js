@@ -60,7 +60,7 @@ class Excel {
        
       })
       this.activeCell=this.arr2d[0][0];
-      this.arr_selected = [this.activeCell];
+      // this.arr_selected = [this.activeCell];
       this.render()
     })
     
@@ -359,6 +359,10 @@ class Excel {
       this.resize(e, this.header)
     );
 
+    this.sidebar.addEventListener("mousedown", (e) =>
+      this.select_row(e, this.header)
+    );
+
     this.canvas.addEventListener("mousemove", (e) => this.grab(e, this.canvas));
 
     this.header.addEventListener("mousedown", (e) =>
@@ -560,7 +564,6 @@ class Excel {
 
     var resize_mouseup = (e) => {
       this.mousedown_resize = false;
-
       header.removeEventListener("mousemove", resize_mousemove);
       header.removeEventListener("mouseup", resize_mouseup);
     };
@@ -596,6 +599,22 @@ class Excel {
       rectDatahead.width = this.arr_width[j];
       counter += this.arr_width[j];
     }
+  }
+
+  select_row(e,header){
+    this.row_selection=true;
+    let arr_select_t = [];
+    let [x7, y1, total] = this.showCoords(this.header, e);
+    console.log(x7,y1)
+    this.row_selected = y1;
+   
+    for (let i = 0; i < this.arr2d[0].length; i++) {
+      arr_select_t.push(this.arr2d[y1][i]);
+    }
+    this.arr_selected = arr_select_t;
+    console.log(this.arr_selected)
+    this.activeCell=this.arr_selected[0];
+    this.render();
   }
 
   /**
@@ -995,7 +1014,6 @@ class Excel {
     } else {
       this.xscroll = false;
     }
-
     if (e.target == this.textbox) {
       return;
     }
@@ -1014,7 +1032,6 @@ class Excel {
         this.activeCell = this.arr2d[rows][cols];
       } else {
         this.activeCell = this.arr2d[rows][cols - 1];
-
         this.activeRow = this.header1dhead[cols - 1];
         cols--;
       }
@@ -1031,6 +1048,7 @@ class Excel {
       this.activeCell = this.arr2d[rows][cols + 1];
       console.log(this.activeCell);
       this.activeRow = this.header1dhead[cols + 1];
+    
     } else if (e.key == "ArrowUp") {
       if (this.arr_width.length > 1 && this.textbox.style.display == "none") {
         this.arr_selected = [];
@@ -1062,7 +1080,9 @@ class Excel {
       this.activeCell = this.arr2d[rows][cols + 1];
     } else if (e.key == "Delete") {
       console.log(this.arr_selected);
-      this.arr_selected.forEach((c) => (c.data = ""));
+      // this.arr_selected.forEach((c) => (c.data = ""));
+      // this.arr_selected.forEach((c) =>this.delete_cell(c))
+      this.delete_cell(e)
       this.activeCell.data = "";
       this.render();
     } else if (e.key == "Backspace") {
@@ -1122,6 +1142,7 @@ class Excel {
    */
   mousedown(e, canvas) {
     this.col_selection = false;
+    this.row_selection=false;
     this.nograbchange = true;
     this.selection_mode = true;
     var mousemove = (e) => {
@@ -1474,10 +1495,17 @@ class Excel {
           rectData["row"] = i;
           rectData["col"] = j;
           row.push(rectData);
+
+          if (this.row_selection && i==this.row_selected) {
+            this.arr_selected.push(rectData);
+            this.render();
+          }
         }
+        
       });
       this.extendHeader(count);
     } else {
+      this.extendSidebar(count);
       let prevRows = this.arr2d.length;
       for (let i = prevRows; i < prevRows + count; i++) {
         let row = this.arr2d[i - 1];
@@ -1496,7 +1524,6 @@ class Excel {
           rectData["bold"]=false
           rectData["id"]=-1;
           rectData["file"]=this.file_id;
-
           rectData["italic"]=false
           rectData["underline"]=false
           rectData["font"]="Arial"
@@ -1506,13 +1533,13 @@ class Excel {
           rectData["row"] = i;
           rectData["col"] = j;
           extend1d.push(rectData);
+          if (this.col_selection && j==this.col_selected) {
+            this.arr_selected.push(rectData);
+            this.render();
+          }
         }
         this.arr2d.push(extend1d);
-        if (this.col_selection && extend1d[this.col_selected]) {
-          this.arr_selected.push(extend1d[this.col_selected]);
-          this.render();
-        }
-        this.extendSidebar(count);
+        
       }
       
     }

@@ -1,5 +1,6 @@
 let list = [];
 let x=0;
+let result;
 function createFileCard(Name, Size,Id) {
   const file_card = `<div class="index-file-child" style="display: flex">
                 <img src="./eximg.PNG" />
@@ -30,6 +31,7 @@ function fetchFile(){
       $(".index-file-grid").html(
         list.map((file) => createFileCard(file.name, Math.floor(file.size/1024),file.id))
       );
+      
     });
   });
 
@@ -81,8 +83,9 @@ async function data(ele) {
         }).then((response) => {
           response.json().then((data) => {
             console.log(data);
+            list.push(data)
             fetchFile()
-            showProgress(data['Id'])
+            showProgress(data)
           });
         });        
       }
@@ -93,18 +96,26 @@ async function data(ele) {
 
 };
 
-function showProgress(file_id) {
- 
+function showProgress(file) {
+
+
   const progressContainer = document.getElementById('progress-container');
   progressContainer.style.display = 'flex';
-  fetch('http://localhost:5183/api/Files/'+file_id).then(response=>response.json()).then(x=>{
-    document.querySelector('.progress-bar-inner').style.width=x.progress+"%";
-    if(x.progress<100)
-    showProgress(file_id)
+  fetch('http://localhost:5183/api/Files/'+file.Id+"/status").then(r => r.text()).then(x=>{
+    x=parseInt(x)
+    console.log(x)
+    
+    document.querySelector('.progress-bar-inner').style.width=(file.ChunkCount/x)*100+"%";
+    console.log(file.ChunkCount/x)
+    
+    if(file.ChunkCount/(x || 1)<1)
+    showProgress(file)
     else{
-      document.querySelector('.progress-container').style.display="none";
-      document.querySelector('.progress-bar-inner').style.width="0%";
-
+      setInterval(()=>{
+        document.querySelector('.progress-bar-inner').style.width="0%";
+        document.querySelector('.progress-container').style.display="none";
+      },1000)
+      
     }
    
   })

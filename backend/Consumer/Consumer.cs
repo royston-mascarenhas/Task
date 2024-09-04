@@ -6,34 +6,45 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using System.Diagnostics;
-
+using MongoDB.Driver;
+using MongoDB.Bson;
 class Program
 {
   private static readonly string _connectionString = "Server=localhost;Database=exceldb;User ID=root;Password=root;";
-
+  //private static readonly string _connectionStringMongo = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.0";
+  static IMongoCollection<BsonDocument> collection;
+  private static readonly string connectionStringMongo = "mongodb://localhost:27017";
+  
   private static Stopwatch stopWatch = new Stopwatch();
-
-
 
   static async Task Main(string[] args)
   {
     var factory = new ConnectionFactory() { HostName = "localhost" };
-
     using var connection = factory.CreateConnection();
     using var channel = connection.CreateModel();
+
+    var client = new MongoClient(connectionStringMongo);
+
+    var database = client.GetDatabase("excel");
+
+    var tables = database.ListCollectionNames().ToList();
+
+    if(!tables.Contains("logs")){
+      database.CreateCollection("logs");
+    }
+    collection=database.GetCollection<BsonDocument>("logs");
+    collection.DeleteMany(new BsonDocument());
+
+
     channel.QueueDeclare(queue: "queue", durable: true, exclusive: false, autoDelete: false, arguments: null);
     var consumer = new EventingBasicConsumer(channel);
     int i = 0;
-    
     consumer.Received += async (model, ea) =>
     {
       Console.WriteLine(++i);
       var body = ea.Body.ToArray();
       var message = Encoding.UTF8.GetString(body);
-      // Console.WriteLine($"Message received: {message}");
-
       Request messageData = JsonConvert.DeserializeObject<Request>(message);
-      // await InsertIntoDatabaseAsync(JsonConvert.DeserializeObject<File>(messageData.Data));
       await RequestHandler(message);
     };
     channel.BasicConsume(queue: "queue", autoAck: true, consumer: consumer);
@@ -118,24 +129,20 @@ class Program
       using var sconnection = new MySqlConnection(_connectionString);
       await sconnection.OpenAsync();
       using var ecommand = new MySqlCommand(query, sconnection);
+      ecommand.CommandTimeout=600;
       await ecommand.ExecuteNonQueryAsync();
-      UpdateProgress(file.Progress,file.Id);
+      UpdateProgress(file.Id);
       sconnection.Close();
   }
   
-  private static async Task RequestHandler(string message)
-  {
+  private static async Task RequestHandler(string message){
     Request request = JsonConvert.DeserializeObject<Request>(message);
     string objtype = request.ObjectType;
     string type = request.Type;
-
-
     if (objtype == "files")
     {
       NewFile file = JsonConvert.DeserializeObject<NewFile>(request.Data);
-      if (type == "PUT")
-      {
-
+      if (type == "PUT"){
       }
       if (type == "POST")
       {
@@ -146,15 +153,10 @@ class Program
         // stopWatch.Reset();
       }
     }
-    else
-    {
-      if (type == "PUT")
-      {
-
+    else{
+      if (type == "PUT"){
       }
-      if (type == "POST")
-      {
-
+      if (type == "POST"){
       }
     }
   }
@@ -164,23 +166,19 @@ class Program
     return MySqlHelper.EscapeString(data);
   }
 
-  static async System.Threading.Tasks.Task UpdateProgress(long progress,long id)
-    {
-        using var sconnection = new MySqlConnection(_connectionString);
-        {
-            await sconnection.OpenAsync();
-            var query = "UPDATE files SET progress = progress + @Progress WHERE id = @Id";
-            using (var command = new MySqlCommand(query, sconnection))
-            {
-                command.Parameters.AddWithValue("@Progress",progress);
-                command.Parameters.AddWithValue("@Id",id);
-                await command.ExecuteNonQueryAsync();
-            }
-        }
-    }
+  static async System.Threading.Tasks.Task UpdateProgress(long fileId)
+  {
+    if(collection==null) return;
 
+    // if the document doesn't exist, insert a new document with the fileId and progress
+    collection.InsertOne(new BsonDocument
+        {
+            {"file", fileId}
+        });
+  }
 }
 
+/// Represents a request message sent to the system.
 public class Request
 {
   public string? Type { get; set; }
@@ -190,6 +188,7 @@ public class Request
   public string? Data { get; set; }
 }
 
+/// Represents a file entity in the system.
 public class File
 {
   public long Id { get; set; }
@@ -200,6 +199,8 @@ public class File
   public string? Data { get; set; }
 }
 
+
+/// Represents a new file entity with additional processing information.
 public class NewFile:File
 {
     public string? Data { get; set; }
@@ -207,6 +208,8 @@ public class NewFile:File
     public int StartRow{ get; set;}
 }
 
+
+/// Represents a cell within a file, typically used in spreadsheet-like applications.
 public class Cell
 {
   public long Id { get; set; }

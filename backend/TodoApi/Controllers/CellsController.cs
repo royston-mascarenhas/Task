@@ -47,19 +47,6 @@ namespace TodoApi.Controllers
             return Ok(cells);
         }
 
-
-
-        // [HttpGet("file/{id}/{skip}")]
-        // public async Task<ActionResult<IEnumerable<TodoApi.Models.Cell>>> GetCells(long id, int skip)
-        // {
-        //     return await _context.Cells
-        //         .Where(c => c.File == id)
-        //         // .OrderBy(c => c.Id) // Assuming you have an 'Id' or a similar property to order by
-        //         .Skip(skip)
-        //         .Take(2000)
-        //         .ToListAsync();
-        // }
-
         // GET: api/Files/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TodoApi.Models.Cell>> GetCell(long id)
@@ -109,9 +96,7 @@ namespace TodoApi.Controllers
             _context.Cells.Add(cell);
             _context.SaveChanges();
             return cell;
-            
         }
-        
 
         // DELETE: api/Files/5
         [HttpDelete("{id}")]
@@ -122,26 +107,35 @@ namespace TodoApi.Controllers
             {
                 return NotFound();
             }
-
             _context.Cells.Remove(todoItem);
            await _context.SaveChangesAsync();  
 
             return NoContent();
         }
 
+
+        /// <summary>
+        /// Checks if a cell with the specified ID exists in the database.
+        /// </summary>
         private bool CellExists(long id)
         {
             return _context.Cells.Any(e => e.Id == id);
         }
 
-
-        private string ProducerRequest(string s,string Data){
-            var payload=new
+        /// <summary>
+        /// Creates a JSON payload for producing a message.
+        /// </summary>
+        private string ProducerRequest(string type, string data)
+        {
+            // Construct an anonymous object with the provided type and data
+            var payload = new
             {
-                Type=s,
-                ObjectType="cells",
-                Data
+                Type = type,
+                ObjectType = "cells", // Hardcoded object type indicating the context (e.g., "cells")
+                Data = data
             };
+
+            // Serialize the payload object to a JSON string
             return JsonConvert.SerializeObject(payload);
         }
     }

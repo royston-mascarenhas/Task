@@ -1,5 +1,8 @@
 namespace TodoApi.Models;
 
+/// <summary>
+/// Represents a cell in a table or grid with various formatting and content options.
+/// </summary>
 public class Cell
 {
     public long Id { get; set; }
