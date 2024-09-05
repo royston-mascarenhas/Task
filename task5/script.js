@@ -45,10 +45,11 @@ class Excel {
     this.dx = 0;
     this.dy = 0;
     this.first = true;
+    this.keyFirst=false;
     this.col_selection = false;
     this.take=2000;
     this.skip=2000;
-    
+    this.doubleClickDetected=false;
     this.render();
   }
 
@@ -602,6 +603,40 @@ class Excel {
   }
 
   select_row(e,header){
+    var mousemove=(e)=>{
+      let [x1, y1, sum] = this.showCoords(this.canvas, e);
+      console.log(x1,y1);
+      for (let i = 0; i < this.arr2d[0].length; i++) {
+        arr_select_t.push(this.arr2d[y1][i]);
+      }
+      this.arr_selected = arr_select_t;
+      console.log(this.arr_selected)
+      this.render()
+
+      // let r1 = this.cell_initial.rows;
+      // let r2 = this.cell_final.rows;
+      // let c1 = this.cell_initial.cols;
+      // let c2 = this.cell_final.cols;
+      // this.arr_select_temp = [];
+      // let ele = 0;
+      // for (var i = Math.min(r1, r2); i <= Math.max(r1, r2); i++) {
+      //   for (var j = Math.min(c1, c2); j <= Math.max(c1, c2); j++) {
+      //     this.final_cell = this.arr2d[i][j];
+      //     this.arr_select_temp.push(this.final_cell);
+      //   }
+      // }
+      // this.arr_diff = this.arr_selected.filter(
+      //   (c) => this.arr_select_temp.indexOf(c) === -1
+      // );
+      // this.arr_selected = this.arr_select_temp;
+      // this.render();
+    
+    }
+    var mouseup = (e) => {
+        this.sidebar.removeEventListener("mousemove", mousemove);
+        //this.sidebar.removeEventListener("mousedown", this.mousedown);
+        this.sidebar.removeEventListener("mouseup", mouseup);
+    }
     this.row_selection=true;
     let arr_select_t = [];
     let [x7, y1, total] = this.showCoords(this.header, e);
@@ -614,6 +649,9 @@ class Excel {
     this.arr_selected = arr_select_t;
     console.log(this.arr_selected)
     this.activeCell=this.arr_selected[0];
+
+    this.sidebar.addEventListener("mousemove", mousemove);
+    this.sidebar.addEventListener("mouseup", mouseup);
     this.render();
   }
 
@@ -767,6 +805,7 @@ class Excel {
    */
   double_click(e, canvas) {
     e.preventDefault();
+    this.doubleClickDetected=true;
     let [x5, y5, sum] = this.showCoords(this.canvas, e);
     this.cell = this.arr2d[y5][x5 - 1];
     this.textbox_visible(this.cell);
@@ -817,6 +856,7 @@ class Excel {
     this.activeCell.data = "";
     this.arr_selected.forEach((c) => {
       c.data = "";
+      if(c.id!==-1){
       fetch(`http://localhost:5183/api/Cells/${c.id}`, {
         method: "DELETE",
       }).then(response => {
@@ -824,6 +864,7 @@ class Excel {
           c.data = "";
         });
       });
+    }
     });
     this.render();
   };
@@ -1014,12 +1055,22 @@ class Excel {
     } else {
       this.xscroll = false;
     }
-    if (e.target == this.textbox) {
-      return;
+    let { rows, cols } = this.activeCell;
+    if (e.key == "Enter") {
+      this.textbox.style.display = "none";
+      this.cell=this.arr2d[rows][cols];
+      this.activeCell = this.arr2d[rows + 1][cols];
+      this.doubleClickDetected=false;
+      this.keyFirst=false;
+      this.textbox.blur();
+      this.arr_selected=[this.activeCell]
+      this.render()
     }
 
-    let { rows, cols } = this.activeCell;
-
+    if (e.target == this.textbox && this.doubleClickDetected) {
+      return;
+    }
+    
     if (e.key == "ArrowLeft") {
       if (this.arr_width.length > 1 && this.textbox.style.display == "none") {
         this.arr_selected = [];
@@ -1031,10 +1082,16 @@ class Excel {
       if (cols <= 0) {
         this.activeCell = this.arr2d[rows][cols];
       } else {
+        this.cell = this.arr2d[rows][cols];
         this.activeCell = this.arr2d[rows][cols - 1];
         this.activeRow = this.header1dhead[cols - 1];
         cols--;
       }
+      
+      this.keyFirst=false;
+      this.textbox.blur();
+      
+      // this.arr_selected=this.activeCell
     } else if (e.key == "ArrowRight") {
       console.log("h");
       if (this.arr_width.length > 1 && this.textbox.style.display == "none") {
@@ -1045,10 +1102,12 @@ class Excel {
         this.dx += 100;
       }
       this.textbox.style.display = "none";
+      this.cell = this.arr2d[rows][cols];
       this.activeCell = this.arr2d[rows][cols + 1];
       console.log(this.activeCell);
       this.activeRow = this.header1dhead[cols + 1];
-    
+      this.keyFirst=false;
+      this.textbox.blur();
     } else if (e.key == "ArrowUp") {
       if (this.arr_width.length > 1 && this.textbox.style.display == "none") {
         this.arr_selected = [];
@@ -1060,10 +1119,13 @@ class Excel {
       if (rows <= 0) {
         this.activeCell = this.arr2d[rows][cols];
       } else {
+        this.cell = this.arr2d[rows][cols];
         this.activeCell = this.arr2d[rows - 1][cols];
         this.activeCol = this.header1dside[rows - 1];
         rows--;
       }
+      this.keyFirst=false;
+      this.textbox.blur();
     } else if (e.key == "ArrowDown") {
       if (this.arr_width.length > 1 && this.textbox.style.display == "none") {
         this.arr_selected = [];
@@ -1072,12 +1134,21 @@ class Excel {
         this.dy += 90;
       }
       this.textbox.style.display = "none";
+      this.cell = this.arr2d[rows][cols];
       this.activeCell = this.arr2d[rows + 1][cols];
       this.activeCol = this.header1dside[rows + 1];
+      this.keyFirst=false;
+      this.textbox.blur();
     } else if (e.which == 27) {
     } else if (e.key == "Tab") {
+      this.cell=this.arr2d[rows][cols]
+      this.textbox.style.display="none"
+      this.textbox.blur()
+      this.doubleClickDetected=false;
+      this.keyFirst=false;
       e.preventDefault();
       this.activeCell = this.arr2d[rows][cols + 1];
+      
     } else if (e.key == "Delete") {
       console.log(this.arr_selected);
       // this.arr_selected.forEach((c) => (c.data = ""));
@@ -1092,7 +1163,7 @@ class Excel {
     } else if (e.key == "Enter") {
       this.textbox.style.display = "none";
       this.activeCell = this.arr2d[rows + 1][cols];
-    } else if (e.ctrlKey && e.key == "c") {
+    }else if (e.ctrlKey && e.key == "c") {
       this.copy_cell();
     } else if (e.ctrlKey && e.key == "v") {
       this.paste_cell();
@@ -1101,10 +1172,16 @@ class Excel {
       this.cut_cell();
     }
 
+    if(this.keyFirst){
+      return;
+    }
     if (e.key.match(/^\w$/)) {
+      this.keyFirst=true;
+      this.cell=this.arr2d[rows][cols];
+      this.cell.data="";
       this.textbox_visible(this.activeCell);
     }
-
+    this.arr_selected=[];
     this.arr_selected.push(this.activeCell);
 
     !e.shiftKey && this.render();
@@ -1141,6 +1218,8 @@ class Excel {
    * @returns
    */
   mousedown(e, canvas) {
+    this.keyFirst=false;
+    this.doubleClickDetected=false;
     this.col_selection = false;
     this.row_selection=false;
     this.nograbchange = true;
@@ -1173,7 +1252,6 @@ class Excel {
         this.render();
         return;
       }
-
       this.grab_detected = false;
       let [x1, y1, sum] = this.showCoords(this.canvas, e);
       this.cell_final = this.arr2d[y1][x1 - 1];
