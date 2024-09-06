@@ -31,7 +31,6 @@ function fetchFile(){
       $(".index-file-grid").html(
         list.map((file) => createFileCard(file.name, Math.floor(file.size/1024),file.id))
       );
-      
     });
   });
 
@@ -55,6 +54,7 @@ function delete_file(id){
   });
 }
 
+
 function open_file(id){
   window.open(
     window.location.origin + "/task5/excel.html?id="+id,"_blank"
@@ -64,7 +64,6 @@ async function data(ele) {
    const input =ele.files[0]
    const reader = new FileReader();
    reader.onload = function (e) {
-
      const text = e.target.result;
      for (let index = 0; index < 1; index++){
         fetch("http://localhost:5183/api/Files",{
@@ -97,27 +96,20 @@ async function data(ele) {
 };
 
 function showProgress(file) {
-
-
   const progressContainer = document.getElementById('progress-container');
   progressContainer.style.display = 'flex';
   fetch('http://localhost:5183/api/Files/'+file.Id+"/status").then(r => r.text()).then(x=>{
     x=parseInt(x)
     console.log(x)
-    
     document.querySelector('.progress-bar-inner').style.width=(file.ChunkCount/x)*100+"%";
     console.log(file.ChunkCount/x)
     
     if(file.ChunkCount/(x || 1)<1)
     showProgress(file)
     else{
-      setInterval(()=>{
         document.querySelector('.progress-bar-inner').style.width="0%";
         document.querySelector('.progress-container').style.display="none";
-      },1000)
-      
     }
-   
   })
 }
 

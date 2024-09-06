@@ -23,19 +23,19 @@ class Excel {
    * @param {HTMLDivElement} container wrapper for Excel
    */
   constructor(id, container) {
-    this.extdata=[];
-    this.arr2d=[];
+    this.extdata = [];
+    this.arr2d = [];
     // this.csv = csv;
-    this.file_id=id
+    this.file_id = id;
     this.lineDashOffset = 0;
     this.container = container;
     this.header1dhead = [];
     this.header1dside = [];
     this.createcanvas();
     // this.jsonToExcel(data);
-    this.extendData(100,1)
-    this.extendData(100,2)
-    this.page_index=1;
+    this.extendData(100, 1);
+    this.extendData(100, 2);
+    this.page_index = 1;
     this.pagination();
     this.math_sum = 0;
     this.scrollX = 0;
@@ -45,26 +45,35 @@ class Excel {
     this.dx = 0;
     this.dy = 0;
     this.first = true;
-    this.keyFirst=false;
+    this.keyFirst = false;
     this.col_selection = false;
-    this.take=2000;
-    this.skip=2000;
-    this.doubleClickDetected=false;
+    this.take = 2000;
+    this.skip = 2000;
+    this.arr_select_t=[]
+    this.doubleClickDetected = false;
     this.render();
   }
 
-  pagination(){
+  pagination() {
     let cell;
-    fetch("http://localhost:5183/api/Cells/file/"+this.file_id+"/"+this.page_index++).then(response=>response.json()).then(data=>{
-      data.forEach(cell=>{
-        this.arr2d[cell.row][cell.col]={...this.arr2d[cell.row][cell.col],...cell}
-       
-      })
-      this.activeCell=this.arr2d[0][0];
-      // this.arr_selected = [this.activeCell];
-      this.render()
-    })
-    
+    fetch(
+      "http://localhost:5183/api/Cells/file/" +
+        this.file_id +
+        "/" +
+        this.page_index++
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        data.forEach((cell) => {
+          this.arr2d[cell.row][cell.col] = {
+            ...this.arr2d[cell.row][cell.col],
+            ...cell,
+          };
+        });
+        this.activeCell = this.arr2d[0][0];
+        // this.arr_selected = [this.activeCell];
+        this.render();
+      });
   }
 
   // async upload(){
@@ -177,38 +186,31 @@ class Excel {
   // }
 
   jsonToExcel(data) {
-    console.log(data);
     let counter = 0;
     this.arr2d = [];
-
     let max_col = Math.max(...data.map((d) => d.col));
-    this.max_col=max_col
-    console.log(max_col);
+    this.max_col = max_col;
     let max_row = Math.max(...data.map((d) => d.row));
-    console.log(max_row);
-
     for (let i = 0; i < max_row; i++) {
       counter = 0;
       let data1d = [];
-      for (let j = 0; j < max_col+1; j++) {
-        let d = {...data[i * (max_col) + j]};
+      for (let j = 0; j < max_col + 1; j++) {
+        let d = { ...data[i * max_col + j] };
         d["xpos"] = counter;
         d["ypos"] = i * 30;
         d["width"] = this.arr_width[j];
         d["height"] = 30;
         d["color"] = "#9A9A9AFF";
-        d["data"] = data[i * (max_col+1) + j]['data'];
+        d["data"] = data[i * (max_col + 1) + j]["data"];
         d["lineWidth"] = 1;
         d["rows"] = i;
         d["cols"] = j;
-        console.log(data[i * j + j]['data'])
         data1d.push(d);
         counter += this.arr_width[j];
       }
       this.arr2d.push(data1d);
-      data1d=[]
+      data1d = [];
     }
-    console.log(this.arr2d);
 
     this.extendHeader(this.arr2d[0].length);
     this.extendSidebar(this.arr2d.length);
@@ -216,7 +218,7 @@ class Excel {
     this.activeCell = this.arr2d[0][0];
     this.arr_selected = [this.activeCell];
 
-    this.render()
+    this.render();
   }
   /**
    * Creates HTML Elements
@@ -352,6 +354,7 @@ class Excel {
     this.canvas.addEventListener("contextmenu", (e) =>
       this.right_click(e, this.canvas)
     );
+    
     this.canvas.addEventListener("mousedown", (e) =>
       this.mousedown(e, this.canvas)
     );
@@ -382,7 +385,7 @@ class Excel {
     this.rightclick_1.addEventListener("click", this.cut_cell);
     this.rightclick_2.addEventListener("click", this.copy_cell);
     this.rightclick_3.addEventListener("click", this.paste_cell);
-    this.rightclick_4.addEventListener("click", this.delete_cell);
+    this.rightclick_4.addEventListener("click", this.delete_row);
     this.rightclick_5.addEventListener("click", this.sort_cell);
     this.rightclick_6.addEventListener("click", this.graph_cell);
   }
@@ -602,53 +605,51 @@ class Excel {
     }
   }
 
-  select_row(e,header){
-    var mousemove=(e)=>{
-      let [x1, y1, sum] = this.showCoords(this.canvas, e);
-      console.log(x1,y1);
-      for (let i = 0; i < this.arr2d[0].length; i++) {
-        arr_select_t.push(this.arr2d[y1][i]);
-      }
-      this.arr_selected = arr_select_t;
-      console.log(this.arr_selected)
-      this.render()
+  /**
+   * Used to select and highlight an entire row
+   * @param {*} MouseEvent
+   * @param {*} HTMLCanvasElement
+   */
+  select_row(e, header) {
+    var mousemove = (e) => {
 
-      // let r1 = this.cell_initial.rows;
-      // let r2 = this.cell_final.rows;
-      // let c1 = this.cell_initial.cols;
-      // let c2 = this.cell_final.cols;
-      // this.arr_select_temp = [];
-      // let ele = 0;
-      // for (var i = Math.min(r1, r2); i <= Math.max(r1, r2); i++) {
-      //   for (var j = Math.min(c1, c2); j <= Math.max(c1, c2); j++) {
-      //     this.final_cell = this.arr2d[i][j];
-      //     this.arr_select_temp.push(this.final_cell);
-      //   }
-      // }
-      // this.arr_diff = this.arr_selected.filter(
-      //   (c) => this.arr_select_temp.indexOf(c) === -1
-      // );
-      // this.arr_selected = this.arr_select_temp;
-      // this.render();
-    
-    }
+      let [x1, y1, sum] = this.showCoords(this.canvas, e);
+      for (let i = 0; i < this.arr2d[0].length; i++) {
+        const item = this.arr2d[y1][i];
+        if (!this.arr_select_t.includes(item)) {
+          this.arr_select_t.push(item);
+        }
+      }
+      this.arr_selected = this.arr_select_t;
+
+      this.render();
+    };
     var mouseup = (e) => {
-        this.sidebar.removeEventListener("mousemove", mousemove);
-        //this.sidebar.removeEventListener("mousedown", this.mousedown);
-        this.sidebar.removeEventListener("mouseup", mouseup);
-    }
-    this.row_selection=true;
+      console.log(this.arr_selected);
+      const uniqueRows = new Set();
+      this.arr_selected.forEach(c => {
+        uniqueRows.add(c.row);
+      });
+      this.uniqueRowArray = Array.from(uniqueRows).sort((a, b) => a - b);
+      console.log(this.uniqueRowArray);
+
+
+      this.sidebar.removeEventListener("mousemove", mousemove);
+      this.arr_select_t=[]
+      //this.sidebar.removeEventListener("mousedown", this.mousedown);
+      this.sidebar.removeEventListener("mouseup", mouseup);
+    };
+    this.row_selection = true;
     let arr_select_t = [];
     let [x7, y1, total] = this.showCoords(this.header, e);
-    console.log(x7,y1)
     this.row_selected = y1;
-   
+
     for (let i = 0; i < this.arr2d[0].length; i++) {
       arr_select_t.push(this.arr2d[y1][i]);
     }
+
     this.arr_selected = arr_select_t;
-    console.log(this.arr_selected)
-    this.activeCell=this.arr_selected[0];
+    this.activeCell = this.arr_selected[0];
 
     this.sidebar.addEventListener("mousemove", mousemove);
     this.sidebar.addEventListener("mouseup", mouseup);
@@ -661,8 +662,6 @@ class Excel {
    * @param {CanvasRenderingContext2D} x
    */
   createCell(data, x) {
-
-    // console.log(data)
     switch (x) {
       case this.stx:
         x.translate(this.scrollX, 0);
@@ -673,7 +672,6 @@ class Excel {
       default:
         break;
     }
-
     x.restore();
     x.save();
     x.beginPath();
@@ -805,7 +803,7 @@ class Excel {
    */
   double_click(e, canvas) {
     e.preventDefault();
-    this.doubleClickDetected=true;
+    this.doubleClickDetected = true;
     let [x5, y5, sum] = this.showCoords(this.canvas, e);
     this.cell = this.arr2d[y5][x5 - 1];
     this.textbox_visible(this.cell);
@@ -847,10 +845,6 @@ class Excel {
     this.rightclick.style.background = "white";
   }
 
-  /**
-   * Delete value inside a cell or set of cells
-   * @param {MouseEvent|KeyboardEvent} e       
-   */
   delete_cell = (e) => {
     this.rightclick.style.display = "none";
     this.activeCell.data = "";
@@ -865,9 +859,205 @@ class Excel {
         });
       });
     }
-    });
-    this.render();
-  };
+  });
+  this.render();
+};
+  /**
+   * Delete value inside a cell or set of cells
+   * @param {MouseEvent|KeyboardEvent} e
+   */
+  // delete_row = (e) => {
+  //   document.querySelector('.progress-container').style.display="flex";
+  //   let arr =  this.uniqueRowArray;
+  //   this.rightclick.style.display = "none";
+  //   this.activeCell.data = "";
+  //   this.arr_selected.forEach((c) => {
+  //     c.data = "";
+  //     if (c.id !== -1) {
+  //       fetch(`http://localhost:5183/api/Cells/${c.id}`, {
+  //         method: "DELETE",
+  //       }).then((response) => {
+  //           c.data = "";
+  //       });
+  //     }
+  //   });
+
+  //   let pending = [];
+  //   for (let i = arr[arr.length - 1] + 1; i < this.arr2d.length; i++) {
+  //     for (let j = 0; j < this.arr2d[0].length; j++) {
+  //       let c = this.arr2d[i][j];
+  //       if (c.id !== -1) {
+  //         const req = fetch(`http://localhost:5183/api/Cells/${c.id}`, {
+  //           method: "PUT",
+  //           body: JSON.stringify({ ...c, row: c.row - arr.length }),
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //         }).then((response) => {
+  //           response.json().then((o) => {
+  //             console.log(o);
+  //             this.arr2d[i][j].row = o.Row;
+  //           });
+  //         });
+  //         pending.push(req);
+  //       }
+  //     }
+  //     console.log(pending.length)
+  //   }
+  //   Promise.all(pending).then(() => {
+  //     document.querySelector('.progress-container').style.display="none";
+  //     location.reload();
+  //   });
+  //   this.render();
+  // };
+
+
+
+//   delete_row = (e) => {
+//     document.querySelector('.progress-container').style.display = "flex";
+//     let arr = this.uniqueRowArray;
+//     this.rightclick.style.display = "none";
+//     this.activeCell.data = "";
+    
+//     let pending = [];
+//     let pendingCount = 0;
+//     let totalRequests = 0;
+
+//     function updateProgressBar() {
+//         const percentage = ((totalRequests - pendingCount) / totalRequests) * 100;
+//         document.querySelector('.progress-bar-inner').style.width = `${percentage}%`;
+//         if (pendingCount === 0) {
+//             document.querySelector('.progress-container').style.display = "none";
+//             location.reload();
+//         }
+//     }
+
+//     this.arr_selected.forEach((c) => {
+//         c.data = "";
+//         if (c.id !== -1) {
+//             totalRequests++;
+//             pendingCount++;
+//             const deletePromise = fetch(`http://localhost:5183/api/Cells/${c.id}`, {
+//                 method: "DELETE",
+//             }).then(() => {
+//                 c.data = "";
+//                 pendingCount--;
+//                 updateProgressBar();
+//             }).catch((error) => {
+//                 console.error('Error deleting cell:', error);
+//                 pendingCount--;
+//                 updateProgressBar();
+//             });
+//             pending.push(deletePromise);
+//         }
+//     });
+//     for (let i = arr[arr.length - 1] + 1; i < this.arr2d.length; i++){
+//         for (let j = 0; j < this.arr2d[0].length; j++) {
+//             let c = this.arr2d[i][j];
+//             if (c.id !== -1) {
+//                 totalRequests++;
+//                 pendingCount++;
+//                 const putPromise = fetch(`http://localhost:5183/api/Cells/${c.id}`, {
+//                     method: "PUT",
+//                     body: JSON.stringify({ ...c, row: c.row - arr.length }),
+//                     headers: {
+//                         "Content-Type": "application/json",
+//                     },
+//                 }).then((response) => {
+//                     return response.json().then((o) => {
+//                         console.log(o);
+//                         this.arr2d[i][j].row = o.Row;
+//                         pendingCount--;
+//                         updateProgressBar();
+//                     });
+//                 }).catch((error) => {
+//                     console.error('Error updating cell:', error);
+//                     pendingCount--;
+//                     updateProgressBar();
+//                 });
+//                 pending.push(putPromise);
+//             }
+//         }
+//     }
+//     this.render();
+//     Promise.all(pending).catch((error) => {
+//         console.error('Error in one of the promises:', error);
+//     });
+// };
+
+delete_row = (e) => {
+  document.querySelector('.progress-container').style.display = "flex";
+  let arr = this.uniqueRowArray;
+  this.rightclick.style.display = "none";
+  this.activeCell.data = "";
+  
+  const concurrencyLimit = 50; // Number of concurrent requests
+  const requestQueue = new RequestQueue(concurrencyLimit);
+
+  let totalRequests = 0;
+  let pendingCount = 0;
+
+  function updateProgressBar() {
+      const percentage = ((totalRequests - pendingCount) / totalRequests) * 100;
+      document.querySelector('.progress-bar-inner').style.width = `${percentage}%`;
+      if (pendingCount === 0) {
+          document.querySelector('.progress-container').style.display = "none";
+          location.reload();
+      }
+  }
+
+  this.arr_selected.forEach((c) => {
+      if (c.id !== -1) {
+          totalRequests++;
+          pendingCount++;
+          requestQueue.add(() => 
+              fetch(`http://localhost:5183/api/Cells/${c.id}`, { method: "DELETE" })
+              .then(() => {
+                  c.data = "";
+                  pendingCount--;
+                  updateProgressBar();
+              })
+              .catch((error) => {
+                  console.error('Error deleting cell:', error);
+                  pendingCount--;
+                  updateProgressBar();
+              })
+          );
+      }
+  });
+
+  for (let i = arr[arr.length - 1] + 1; i < this.arr2d.length; i++) {
+      for (let j = 0; j < this.arr2d[0].length; j++) {
+          let c = this.arr2d[i][j];
+          if (c.id !== -1) {
+              totalRequests++;
+              pendingCount++;
+              requestQueue.add(() => 
+                  fetch(`http://localhost:5183/api/Cells/${c.id}`, {
+                      method: "PUT",
+                      body: JSON.stringify({ ...c, row: c.row - arr.length }),
+                      headers: { "Content-Type": "application/json" }
+                  })
+                  .then((response) => response.json())
+                  .then((o) => {
+                      console.log(o);
+                      this.arr2d[i][j].row = o.Row;
+                      pendingCount--;
+                      updateProgressBar();
+                  })
+                  .catch((error) => {
+                      console.error('Error updating cell:', error);
+                      pendingCount--;
+                      updateProgressBar();
+                  })
+              );
+          }
+      }
+  }
+
+  this.render();
+};
+
 
   /**
    * Cuts  a cell or set of cells
@@ -915,7 +1105,7 @@ class Excel {
         for (let j = 0; j < this.arr_selected_2d[0].length; j++) {
           this.arr2d[this.activeCell.rows + i][this.activeCell.cols + j].data =
             this.arr_selected_2d[i][j].data;
-            
+
           if (this.op_cut) {
             this.arr_selected_2d[i][j].data = "";
             this.first = true;
@@ -927,7 +1117,6 @@ class Excel {
       this.arr2d[this.activeCell.rows][this.activeCell.cols].data =
         this.arr_selected_2d[0][0].data;
       if (this.op_cut) {
-        
         this.arr_selected_2d[0][0].data = "";
         this.op_cut = false;
         this.first = true;
@@ -935,8 +1124,6 @@ class Excel {
     }
     this.render();
   };
-
-
 
   /**
    * Delete value inside a cell or set of cells
@@ -986,7 +1173,7 @@ class Excel {
    * @param {Cell} cell
    */
   textbox_visible(cell) {
-    this.textbox.style.display ="block";
+    this.textbox.style.display = "block";
     this.textbox.style.width = `${cell.width}px`;
     this.textbox.style.left = `${cell.xpos + 60 - this.scrollX}px`;
     this.textbox.style.top = `${cell.ypos - this.scrollY}px`;
@@ -1004,44 +1191,42 @@ class Excel {
    */
   textset(event, canvas) {
     var t1 = event.target.value;
-    console.log(this.cell)
-    this.cell.data=t1
+    this.cell.data = t1;
 
-    if(this.cell.id!==-1){
-      fetch("http://localhost:5183/api/Cells/"+this.cell["id"],{
-        method:"PUT",
-        body:JSON.stringify({
+    if (this.cell.id !== -1) {
+      fetch("http://localhost:5183/api/Cells/" + this.cell["id"], {
+        method: "PUT",
+        body: JSON.stringify({
           ...this.cell,
-          data: t1
+          data: t1,
         }),
-        headers:{
-          "content-type":"application/json"
-        }
-       }).then(response=>{
-        response.json().then(o =>{
-          this.cell.data=o.Data
-        })
-       })
-    }else{
-      fetch("http://localhost:5183/api/Cells/",{
-        method:"POST",
-        body:JSON.stringify({
+        headers: {
+          "content-type": "application/json",
+        },
+      }).then((response) => {
+        response.json().then((o) => {
+          this.cell.data = o.Data;
+        });
+      });
+    } else {
+      fetch("http://localhost:5183/api/Cells/", {
+        method: "POST",
+        body: JSON.stringify({
           ...this.cell,
-          data: t1
+          data: t1,
         }),
-        headers:{
-          "content-type":"application/json"
-        }
-       }).then(response=>{
-        response.json().then(o =>{
-          this.cell.data=o["data"]
-          this.cell.id=o.id
-        })
-       })
+        headers: {
+          "content-type": "application/json",
+        },
+      }).then((response) => {
+        response.json().then((o) => {
+          this.cell.data = o["data"];
+          this.cell.id = o.id;
+        });
+      });
     }
-    
+
     // this.cell.data = t1;
-   
   }
 
   /**
@@ -1058,19 +1243,19 @@ class Excel {
     let { rows, cols } = this.activeCell;
     if (e.key == "Enter") {
       this.textbox.style.display = "none";
-      this.cell=this.arr2d[rows][cols];
+      this.cell = this.arr2d[rows][cols];
       this.activeCell = this.arr2d[rows + 1][cols];
-      this.doubleClickDetected=false;
-      this.keyFirst=false;
+      this.doubleClickDetected = false;
+      this.keyFirst = false;
       this.textbox.blur();
-      this.arr_selected=[this.activeCell]
-      this.render()
+      this.arr_selected = [this.activeCell];
+      this.render();
     }
 
     if (e.target == this.textbox && this.doubleClickDetected) {
       return;
     }
-    
+
     if (e.key == "ArrowLeft") {
       if (this.arr_width.length > 1 && this.textbox.style.display == "none") {
         this.arr_selected = [];
@@ -1087,16 +1272,14 @@ class Excel {
         this.activeRow = this.header1dhead[cols - 1];
         cols--;
       }
-      
-      this.keyFirst=false;
+
+      this.keyFirst = false;
       this.textbox.blur();
-      
+
       // this.arr_selected=this.activeCell
     } else if (e.key == "ArrowRight") {
-      console.log("h");
       if (this.arr_width.length > 1 && this.textbox.style.display == "none") {
         this.arr_selected = [];
-        console.log("ello");
       }
       if (this.activeCell.xpos + 200 > this.scrollX + this.canvas.width) {
         this.dx += 100;
@@ -1104,9 +1287,8 @@ class Excel {
       this.textbox.style.display = "none";
       this.cell = this.arr2d[rows][cols];
       this.activeCell = this.arr2d[rows][cols + 1];
-      console.log(this.activeCell);
       this.activeRow = this.header1dhead[cols + 1];
-      this.keyFirst=false;
+      this.keyFirst = false;
       this.textbox.blur();
     } else if (e.key == "ArrowUp") {
       if (this.arr_width.length > 1 && this.textbox.style.display == "none") {
@@ -1124,7 +1306,7 @@ class Excel {
         this.activeCol = this.header1dside[rows - 1];
         rows--;
       }
-      this.keyFirst=false;
+      this.keyFirst = false;
       this.textbox.blur();
     } else if (e.key == "ArrowDown") {
       if (this.arr_width.length > 1 && this.textbox.style.display == "none") {
@@ -1137,23 +1319,20 @@ class Excel {
       this.cell = this.arr2d[rows][cols];
       this.activeCell = this.arr2d[rows + 1][cols];
       this.activeCol = this.header1dside[rows + 1];
-      this.keyFirst=false;
+      this.keyFirst = false;
       this.textbox.blur();
-    } else if (e.which == 27) {
     } else if (e.key == "Tab") {
-      this.cell=this.arr2d[rows][cols]
-      this.textbox.style.display="none"
-      this.textbox.blur()
-      this.doubleClickDetected=false;
-      this.keyFirst=false;
+      this.cell = this.arr2d[rows][cols];
+      this.textbox.style.display = "none";
+      this.textbox.blur();
+      this.doubleClickDetected = false;
+      this.keyFirst = false;
       e.preventDefault();
       this.activeCell = this.arr2d[rows][cols + 1];
-      
     } else if (e.key == "Delete") {
-      console.log(this.arr_selected);
       // this.arr_selected.forEach((c) => (c.data = ""));
       // this.arr_selected.forEach((c) =>this.delete_cell(c))
-      this.delete_cell(e)
+      this.delete_cell(e);
       this.activeCell.data = "";
       this.render();
     } else if (e.key == "Backspace") {
@@ -1163,7 +1342,7 @@ class Excel {
     } else if (e.key == "Enter") {
       this.textbox.style.display = "none";
       this.activeCell = this.arr2d[rows + 1][cols];
-    }else if (e.ctrlKey && e.key == "c") {
+    } else if (e.ctrlKey && e.key == "c") {
       this.copy_cell();
     } else if (e.ctrlKey && e.key == "v") {
       this.paste_cell();
@@ -1172,18 +1351,18 @@ class Excel {
       this.cut_cell();
     }
 
-    if(this.keyFirst){
+    if (this.keyFirst) {
       return;
     }
+
     if (e.key.match(/^\w$/)) {
-      this.keyFirst=true;
-      this.cell=this.arr2d[rows][cols];
-      this.cell.data="";
+      this.keyFirst = true;
+      this.cell = this.arr2d[rows][cols];
+      this.cell.data = "";
       this.textbox_visible(this.activeCell);
     }
-    this.arr_selected=[];
+    this.arr_selected = [];
     this.arr_selected.push(this.activeCell);
-
     !e.shiftKey && this.render();
   }
 
@@ -1218,10 +1397,11 @@ class Excel {
    * @returns
    */
   mousedown(e, canvas) {
-    this.keyFirst=false;
-    this.doubleClickDetected=false;
+    console.log(this.arr_selected)
+    this.keyFirst = false;
+    this.doubleClickDetected = false;
     this.col_selection = false;
-    this.row_selection=false;
+    this.row_selection = false;
     this.nograbchange = true;
     this.selection_mode = true;
     var mousemove = (e) => {
@@ -1278,8 +1458,8 @@ class Excel {
       for (let index = 0; index < this.arr_selected.length; index++) {
         if (this.arr_selected[index].data != "") ele++;
       }
-      console.log(this.math_sum);
-      console.log(ele);
+      console.log("SUM : " + this.math_sum);
+      console.log("Number of selected items : " + ele);
       this.render();
     };
     var mouseup = (e) => {
@@ -1299,7 +1479,6 @@ class Excel {
             }
           }
           this.activeCell = arr_selected_temp[0];
-          console.log(arr_selected_temp);
           this.arr_selected = arr_selected_temp;
           this.render();
         } else {
@@ -1320,11 +1499,9 @@ class Excel {
         let minc = Math.min(this.cell_initial.cols, this.cell_final.cols);
         let maxr = Math.max(this.cell_initial.rows, this.cell_final.rows);
         let maxc = Math.max(this.cell_initial.cols, this.cell_final.cols);
-        console.log(minr, minc, maxr, maxc);
         this.arr_selected = [];
         for (let i = minr; i <= maxr; i++) {
           for (let j = minc; j <= maxc; j++) {
-            console.log("hello");
             this.arr2d[i][j].data = this.cell_initial.data;
             this.arr_selected.push(this.arr2d[i][j]);
           }
@@ -1349,7 +1526,6 @@ class Excel {
         canvas.removeEventListener("mouseup", mouseup);
         this.render();
       }
-      console.log(this.arr_selected);
       this.selection_mode = false;
     };
     var mouseleave = (e) => {
@@ -1502,7 +1678,6 @@ class Excel {
     this.t2 = topX2;
   }
 
-  
   /**
    * Used to Identify Wheel Event for scrolling
    * @param {WheelEvent} event
@@ -1524,28 +1699,28 @@ class Excel {
    * @param {number} count
    */
   extendData(count, axis) {
-    if(this.arr2d.length==0){
-      let d={}
-        d["xpos"] = 0;
-        d["ypos"] = 0;
-        d["width"] = 100;
-        d["height"] = 30;
-        d["color"] = "#9A9A9AFF";
-        d["data"] ="";
-        d["lineWidth"] = 1;
-        d["row"] = 0;
-        d["align"]="LEFT";
-        d["col"] = 0;
-        d["id"]=-1;
-        d["file"]=this.file_id;
-        d["bold"]=false
-          d["italic"]=false
-          d["underline"]=false
-          d["font"]="Arial"
-        this.arr2d.push([d]);
-        this.activeCell=d;
-        this.arr_selected = [this.activeCell];
-      }
+    if (this.arr2d.length == 0) {
+      let d = {};
+      d["xpos"] = 0;
+      d["ypos"] = 0;
+      d["width"] = 100;
+      d["height"] = 30;
+      d["color"] = "#9A9A9AFF";
+      d["data"] = "";
+      d["lineWidth"] = 1;
+      d["row"] = 0;
+      d["align"] = "LEFT";
+      d["col"] = 0;
+      d["id"] = -1;
+      d["file"] = this.file_id;
+      d["bold"] = false;
+      d["italic"] = false;
+      d["underline"] = false;
+      d["font"] = "Arial";
+      this.arr2d.push([d]);
+      this.activeCell = d;
+      this.arr_selected = [this.activeCell];
+    }
     if (axis === 1) {
       this.arr2d.forEach((row, i) => {
         let prevColumns = row.length;
@@ -1558,28 +1733,27 @@ class Excel {
           rectData["width"] = 100;
           this.arr_width.push(100);
           rectData["height"] = 30;
-          rectData["bold"]=false
-          rectData["id"]=-1;
-          rectData["file"]=this.file_id;
-          rectData["italic"]=false
-          rectData["underline"]=false
-          rectData["font"]="Arial"
+          rectData["bold"] = false;
+          rectData["id"] = -1;
+          rectData["file"] = this.file_id;
+          rectData["italic"] = false;
+          rectData["underline"] = false;
+          rectData["font"] = "Arial";
           rectData["color"] = "#9A9A9AFF";
           rectData["data"] = "";
           rectData["lineWidth"] = 1;
-          rectData["align"]="LEFT";
+          rectData["align"] = "LEFT";
           rectData["rows"] = i;
           rectData["cols"] = j;
           rectData["row"] = i;
           rectData["col"] = j;
           row.push(rectData);
 
-          if (this.row_selection && i==this.row_selected) {
-            this.arr_selected.push(rectData);
-            this.render();
-          }
+          // if (this.row_selection && i == this.row_selected) {
+          //   this.arr_selected.push(rectData);
+          //   this.render();
+          // }
         }
-        
       });
       this.extendHeader(count);
     } else {
@@ -1592,34 +1766,32 @@ class Excel {
           let left = row[j].xpos;
           let top = row[j].ypos + row[j].height;
           let rectData = {};
-          rectData["xpos"] = left; 
+          rectData["xpos"] = left;
           rectData["ypos"] = top;
           rectData["width"] = this.arr_width[j];
           rectData["height"] = 30;
           rectData["color"] = "#9A9A9AFF";
-          rectData["data"] ="";
-          rectData["align"]="LEFT";
-          rectData["bold"]=false
-          rectData["id"]=-1;
-          rectData["file"]=this.file_id;
-          rectData["italic"]=false
-          rectData["underline"]=false
-          rectData["font"]="Arial"
+          rectData["data"] = "";
+          rectData["align"] = "LEFT";
+          rectData["bold"] = false;
+          rectData["id"] = -1;
+          rectData["file"] = this.file_id;
+          rectData["italic"] = false;
+          rectData["underline"] = false;
+          rectData["font"] = "Arial";
           rectData["lineWidth"] = 1;
           rectData["rows"] = i;
           rectData["cols"] = j;
           rectData["row"] = i;
           rectData["col"] = j;
           extend1d.push(rectData);
-          if (this.col_selection && j==this.col_selected) {
+          if (this.col_selection && j == this.col_selected) {
             this.arr_selected.push(rectData);
             this.render();
           }
         }
         this.arr2d.push(extend1d);
-        
       }
-      
     }
   }
 
@@ -1761,12 +1933,10 @@ class Excel {
     }
     if (Math.abs(finalRow - this.arr2d.length) < 50) {
       this.extendData(100, 2);
-      this.pagination()
+      this.pagination();
     }
     if (Math.abs(initialCol - this.arr2d[0].length) < 50) {
       this.extendData(100, 1);
-      console.log("x")
-      
     }
     this.clearData();
     for (
@@ -1882,6 +2052,38 @@ class Graph {
     });
   }
 }
-const id=new URL(window.location.href).searchParams.get("id")
+const id = new URL(window.location.href).searchParams.get("id");
 let excel = new Excel(id, document.querySelector(".container"));
 
+class RequestQueue {
+  constructor(concurrency) {
+      this.concurrency = concurrency;
+      this.queue = [];
+      this.activeCount = 0;
+  }
+
+  async add(request) {
+      return new Promise((resolve, reject) => {
+          this.queue.push(async () => {
+              try {
+                  this.activeCount++;
+                  await request();
+                  resolve();
+              } catch (error) {
+                  reject(error);
+              } finally {
+                  this.activeCount--;
+                  this.processQueue();
+              }
+          });
+          this.processQueue();
+      });
+  }
+
+  processQueue() {
+      if (this.activeCount < this.concurrency && this.queue.length > 0) {
+          const next = this.queue.shift();
+          next();
+      }
+  }
+}

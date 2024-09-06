@@ -32,9 +32,9 @@ class Program
     if(!tables.Contains("logs")){
       database.CreateCollection("logs");
     }
+
     collection=database.GetCollection<BsonDocument>("logs");
     collection.DeleteMany(new BsonDocument());
-
 
     channel.QueueDeclare(queue: "queue", durable: true, exclusive: false, autoDelete: false, arguments: null);
     var consumer = new EventingBasicConsumer(channel);

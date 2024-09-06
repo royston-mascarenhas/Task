@@ -25,7 +25,6 @@ namespace TodoApi.Controllers
             _context = context;
         }
 
-        
         // GET: api/Files
         /// <summary>
         /// Retrieves all file records from the database.
@@ -109,12 +108,10 @@ namespace TodoApi.Controllers
             _context.Files.Add(file);
             _context.SaveChanges();
 
-            // Retrieve the ID of the newly inserted file
+          
             long lastInsertedId = _context.Files.Max(x => x.Id);
             dataFile.Id = lastInsertedId;
 
-            // Split and process the CSV data in chunks
-            
 
             foreach (var chunk in chunks)
             {
@@ -159,9 +156,9 @@ namespace TodoApi.Controllers
         {
             var payload = new
             {
-                Type = type,
-                ObjectType = "files",
-                Data = data
+            Type = type,
+            ObjectType = "files",
+            Data = data
             };
             return JsonConvert.SerializeObject(payload);
         }
