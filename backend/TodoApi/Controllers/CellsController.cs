@@ -113,6 +113,68 @@ namespace TodoApi.Controllers
             return NoContent();
         }
 
+        [HttpPost("UpdateBulk")]
+        public async Task<IActionResult> UpdateBulk([FromBody] List<Cell> cells)
+        {
+            if (cells == null || !cells.Any())
+            {
+                return BadRequest("No cells to update.");
+            }
+
+            try
+            {
+                var cellIds = cells.Select(c => c.Id).ToList();
+                var existingCells = await _context.Cells.Where(c => cellIds.Contains(c.Id)).ToListAsync();
+
+                foreach (var cell in cells)
+                {
+                    var existingCell = existingCells.FirstOrDefault(c => c.Id == cell.Id);
+                    if (existingCell != null)
+                    {
+                        existingCell.Row = cell.Row;
+                        existingCell.File = cell.File;
+                        existingCell.Col = cell.Col;
+                        existingCell.Data = cell.Data;
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return Ok(existingCells);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPost("DeleteBulk")]
+        public async Task<IActionResult> DeleteBulk([FromBody] List<long> ids)
+        {
+            if (ids == null || !ids.Any())
+            {
+                return BadRequest("No IDs provided for deletion.");
+            }
+
+            try
+            {
+                var cellsToDelete = await _context.Cells
+                    .Where(c => ids.Contains(c.Id))
+                    .ToListAsync();
+
+                if (!cellsToDelete.Any())
+                {
+                    return NotFound("No cells found to delete.");
+                }
+                _context.Cells.RemoveRange(cellsToDelete);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
 
         /// <summary>
         /// Checks if a cell with the specified ID exists in the database.

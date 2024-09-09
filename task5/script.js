@@ -131,13 +131,10 @@ class Excel {
       this.render();
     }
   }
-
-  /**
-   * Converts csv file to string
-   */
+ 
   // csvToExcel() {
-  //   const lines = this.csv.trim().split("\n");
-  //   let headers = lines[0].split(",");
+    //   const lines = this.csv.trim().split("\n");
+    //   let headers = lines[0].split(",");
   //   this.arr2d = [];
   //   this.header1d = [];
   //   let counter = 0;
@@ -185,6 +182,11 @@ class Excel {
   //   this.arr_selected=[this.activeCell]
   // }
 
+
+   /**
+    * Create json
+    * @param {string} data 
+    */
   jsonToExcel(data) {
     let counter = 0;
     this.arr2d = [];
@@ -220,6 +222,8 @@ class Excel {
 
     this.render();
   }
+
+
   /**
    * Creates HTML Elements
    */
@@ -576,6 +580,7 @@ class Excel {
     header.addEventListener("mouseleave", mouseleave);
   }
 
+
   /**
    * Used Adjust left position of cell after resize
    */
@@ -845,6 +850,10 @@ class Excel {
     this.rightclick.style.background = "white";
   }
 
+  /**
+   * Deletes data from the selected array
+   * @param {*} KeyboardEvent 
+   */
   delete_cell = (e) => {
     this.rightclick.style.display = "none";
     this.activeCell.data = "";
@@ -861,11 +870,9 @@ class Excel {
     }
   });
   this.render();
-};
-  /**
-   * Delete value inside a cell or set of cells
-   * @param {MouseEvent|KeyboardEvent} e
-   */
+  };
+
+ 
   // delete_row = (e) => {
   //   document.querySelector('.progress-container').style.display="flex";
   //   let arr =  this.uniqueRowArray;
@@ -985,79 +992,279 @@ class Excel {
 //     });
 // };
 
-delete_row = (e) => {
+
+
+
+
+// delete_row = (e) => {
+//   document.querySelector('.progress-container').style.display = "flex";
+//   let arr = this.uniqueRowArray;
+//   this.rightclick.style.display = "none";
+//   this.activeCell.data = "";
+//   let totalRequests = 0;
+//   let pendingCount = 0;
+
+//   function updateProgressBar() {
+//       const percentage = ((totalRequests - pendingCount) / totalRequests) * 100;
+//       document.querySelector('.progress-bar-inner').style.width = `${percentage}%`;
+//       if (pendingCount === 0) {
+//           document.querySelector('.progress-container').style.display = "none";
+//           location.reload();
+//       }
+//   }
+
+//   // this.arr_selected.forEach((c) => {
+//   //     if (c.id !== -1) {
+//   //         totalRequests++;
+//   //         pendingCount++;
+//   //         requestQueue.add(() => 
+//   //             fetch(`http://localhost:5183/api/Cells/${c.id}`, { method: "DELETE" })
+//   //             .then(() => {
+//   //                 c.data = "";
+//   //                 pendingCount--;
+//   //                 updateProgressBar();
+//   //             })
+//   //             .catch((error) => {
+//   //                 console.error('Error deleting cell:', error);
+//   //                 pendingCount--;
+//   //                 updateProgressBar();
+//   //             })
+//   //         );
+//   //     }
+//   // });
+
+// const idsToDelete = this.arr_selected
+//     .filter(c => c.id !== -1)
+//     .map(c => c.id); 
+
+// if (idsToDelete.length > 0) {
+//     totalRequests = idsToDelete.length; 
+//     pendingCount = idsToDelete.length;  
+
+//     fetch(`http://localhost:5183/api/Cells/DeleteBulk`, {
+//         method: "POST",
+//         body: JSON.stringify(idsToDelete),
+//         headers: { "Content-Type": "application/json" }
+//     })
+//     .then(() => {
+//         this.arr_selected.forEach(c => {
+//             if (c.id !== -1) {
+//                 c.data = "";
+//             }
+//         });
+
+//         pendingCount = 0;
+//         updateProgressBar(); 
+//     })
+//     .catch((error) => {
+//         console.error('Error deleting cells:', error);
+//         pendingCount = 0; 
+//         updateProgressBar();
+//     });
+// } else {
+//     updateProgressBar();
+// }
+
+ 
+// let cellsToUpdate = [];
+// for (let i = arr[arr.length - 1] + 1; i < this.arr2d.length; i++) {
+//     for (let j = 0; j < this.arr2d[0].length; j++) {
+//         let c = this.arr2d[i][j];
+//         if (c.id !== -1) {
+//             cellsToUpdate.push({...c,row: c.row - arr.length});
+//         }
+//     }
+// }
+
+// if (cellsToUpdate.length > 0) {
+//   totalRequests = cellsToUpdate.length; 
+//   pendingCount = cellsToUpdate.length;  
+//   fetch(`http://localhost:5183/api/Cells/UpdateBulk`, {
+//       method: "POST",
+//       body: JSON.stringify(cellsToUpdate),
+//       headers: { "Content-Type": "application/json" }
+//   })
+//   .then((response) => response.json())
+//   .then((responseArray) => {
+//       console.log(responseArray);
+//       responseArray.forEach(updatedCell => {
+//           for (let i = 0; i < this.arr2d.length; i++) {
+//               for (let j = 0; j < this.arr2d[0].length; j++) {
+//                   if (this.arr2d[i][j].id === updatedCell.id) {
+//                       this.arr2d[i][j].row = updatedCell.row;
+//                   }
+//               }
+//           }
+//       });
+
+//       pendingCount = 0; // All requests are processed
+//       updateProgressBar(); // Update the progress bar
+//   })
+//   .catch((error) => {
+//       console.error('Error updating cells:', error);
+//       pendingCount = 0; // Set pending count to 0 in case of error
+//       updateProgressBar(); // Update the progress bar
+//   });
+// } else {
+//   // No cells to update
+//   updateProgressBar();
+// }
+
+
+
+//   // for (let i = arr[arr.length - 1] + 1; i < this.arr2d.length; i++) {
+//   //     for (let j = 0; j < this.arr2d[0].length; j++) {
+//   //         let c = this.arr2d[i][j];
+//   //         if (c.id !== -1) {
+//   //             totalRequests++;
+//   //             pendingCount++;
+//   //             requestQueue.add(() => 
+//   //                 fetch(`http://localhost:5183/api/Cells/${c.id}`, {
+//   //                     method: "PUT",
+//   //                     body: JSON.stringify({ ...c, row: c.row - arr.length }),
+//   //                     headers: { "Content-Type": "application/json" }
+//   //                 })
+//   //                 .then((response) => response.json())
+//   //                 .then((o) => {
+//   //                     console.log(o);
+//   //                     this.arr2d[i][j].row = o.Row;
+//   //                     pendingCount--;
+//   //                     updateProgressBar();
+//   //                 })
+//   //                 .catch((error) => {
+//   //                     console.error('Error updating cell:', error);
+//   //                     pendingCount--;
+//   //                     updateProgressBar();
+//   //                 })
+//   //             );
+//   //         }
+//   //     }
+//   // }
+
+//   this.render();
+// };
+
+
+  /**
+   * Delete entire row and collapse
+   * @param {MouseEvent|KeyboardEvent} e
+   */
+  delete_row = (e) => {
   document.querySelector('.progress-container').style.display = "flex";
   let arr = this.uniqueRowArray;
   this.rightclick.style.display = "none";
   this.activeCell.data = "";
-  
-  const concurrencyLimit = 50; // Number of concurrent requests
-  const requestQueue = new RequestQueue(concurrencyLimit);
-
   let totalRequests = 0;
   let pendingCount = 0;
-
+  
   function updateProgressBar() {
-      const percentage = ((totalRequests - pendingCount) / totalRequests) * 100;
+      const percentage = totalRequests > 0 ? ((totalRequests - pendingCount) / totalRequests) * 100 : 100;
       document.querySelector('.progress-bar-inner').style.width = `${percentage}%`;
+      console.log(`Progress: ${percentage}% (Pending: ${pendingCount})`);
+  
       if (pendingCount === 0) {
+          console.log('All requests completed. Hiding progress container and reloading.');
           document.querySelector('.progress-container').style.display = "none";
-          location.reload();
+          setTimeout(() => {
+            location.reload(); 
+          }, 100);
+          this.render();
       }
   }
-
-  this.arr_selected.forEach((c) => {
-      if (c.id !== -1) {
-          totalRequests++;
-          pendingCount++;
-          requestQueue.add(() => 
-              fetch(`http://localhost:5183/api/Cells/${c.id}`, { method: "DELETE" })
-              .then(() => {
+  
+  // Bulk Deletion
+  const idsToDelete = this.arr_selected
+      .filter(c => c.id !== -1)
+      .map(c => c.id);
+  
+  let deletePromise = Promise.resolve(); // Initialize with resolved promise
+  
+  if (idsToDelete.length > 0) {
+      totalRequests += idsToDelete.length;
+      pendingCount += idsToDelete.length;
+  
+      deletePromise = fetch(`http://localhost:5183/api/Cells/DeleteBulk`, {
+          method: "POST",
+          body: JSON.stringify(idsToDelete),
+          headers: { "Content-Type": "application/json" }
+      }).then(() => {
+          this.arr_selected.forEach(c => {
+              if (c.id !== -1) {
                   c.data = "";
-                  pendingCount--;
-                  updateProgressBar();
-              })
-              .catch((error) => {
-                  console.error('Error deleting cell:', error);
-                  pendingCount--;
-                  updateProgressBar();
-              })
-          );
-      }
-  });
-
+              }
+          });
+          pendingCount -= idsToDelete.length;
+          console.log(`Deleted cells: ${idsToDelete.length}`);
+          updateProgressBar();
+      }).catch((error) => {
+          console.error('Error deleting cells:', error);
+          pendingCount -= idsToDelete.length;
+          updateProgressBar();
+      });
+  }
+  
+  // Bulk Update
+  let cellsToUpdate = [];
   for (let i = arr[arr.length - 1] + 1; i < this.arr2d.length; i++) {
       for (let j = 0; j < this.arr2d[0].length; j++) {
           let c = this.arr2d[i][j];
           if (c.id !== -1) {
-              totalRequests++;
-              pendingCount++;
-              requestQueue.add(() => 
-                  fetch(`http://localhost:5183/api/Cells/${c.id}`, {
-                      method: "PUT",
-                      body: JSON.stringify({ ...c, row: c.row - arr.length }),
-                      headers: { "Content-Type": "application/json" }
-                  })
-                  .then((response) => response.json())
-                  .then((o) => {
-                      console.log(o);
-                      this.arr2d[i][j].row = o.Row;
-                      pendingCount--;
-                      updateProgressBar();
-                  })
-                  .catch((error) => {
-                      console.error('Error updating cell:', error);
-                      pendingCount--;
-                      updateProgressBar();
-                  })
-              );
+              cellsToUpdate.push({ ...c, row: c.row - arr.length });
           }
       }
   }
+  
+  let updatePromise = Promise.resolve(); 
+  
+  if (cellsToUpdate.length > 0) {
+      totalRequests += cellsToUpdate.length;
+      pendingCount += cellsToUpdate.length;
+  
+      updatePromise = fetch(`http://localhost:5183/api/Cells/UpdateBulk`, {
+          method: "POST",
+          body: JSON.stringify(cellsToUpdate),
+          headers: { "Content-Type": "application/json" }
+      }).then(response => response.json())
+        .then(responseArray => {
+            console.log('Update response:', responseArray);
+            responseArray.forEach(updatedCell => {
+                for (let i = 0; i < this.arr2d.length; i++) {
+                    for (let j = 0; j < this.arr2d[0].length; j++) {
+                        if (this.arr2d[i][j].id === updatedCell.id) {
+                            this.arr2d[i][j].row = updatedCell.row;
+                        }
+                    }
+                }
+            });
+            pendingCount -= cellsToUpdate.length;
+            console.log(`Updated cells: ${cellsToUpdate.length}`);
+            updateProgressBar();
+        }).catch(error => {
+            console.error('Error updating cells:', error);
+            pendingCount -= cellsToUpdate.length;
+            updateProgressBar();
+        });
+  } else {
+      console.log('No cells to update.');
+      updateProgressBar(); 
+  }
 
-  this.render();
-};
+  Promise.all([deletePromise, updatePromise]).then(() => {
+      console.log('All promises resolved.');
+      if (pendingCount === 0) {
+          document.querySelector('.progress-container').style.display = "none";
+          this.render();
+          setTimeout(() => {
+              location.reload(); 
+          }, 100);
+      }
+  }).catch(error => {
+      console.error('Error in bulk operations:', error);
+      updateProgressBar();
+  });
+  
 
+  };
 
   /**
    * Cuts  a cell or set of cells
@@ -1147,6 +1354,7 @@ delete_row = (e) => {
     );
     a.render();
   };
+
   /**
    * Delete value inside a cell
    * @param {MouseEvent|KeyboardEvent} e
@@ -1242,6 +1450,17 @@ delete_row = (e) => {
     }
     let { rows, cols } = this.activeCell;
     if (e.key == "Enter") {
+      this.textbox.style.display = "none";
+      this.cell = this.arr2d[rows][cols];
+      this.activeCell = this.arr2d[rows + 1][cols];
+      this.doubleClickDetected = false;
+      this.keyFirst = false;
+      this.textbox.blur();
+      this.arr_selected = [this.activeCell];
+      this.render();
+    }
+    if (e.key == "Tab") {
+      e.preventDefault()
       this.textbox.style.display = "none";
       this.cell = this.arr2d[rows][cols];
       this.activeCell = this.arr2d[rows + 1][cols];
