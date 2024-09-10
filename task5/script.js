@@ -56,12 +56,7 @@ class Excel {
 
   pagination() {
     let cell;
-    fetch(
-      "http://localhost:5183/api/Cells/file/" +
-        this.file_id +
-        "/" +
-        this.page_index++
-    )
+    fetch("http://localhost:5183/api/Cells/file/" +this.file_id +"/"+this.page_index++)
       .then((response) => response.json())
       .then((data) => {
         data.forEach((cell) => {
@@ -70,7 +65,9 @@ class Excel {
             ...cell,
           };
         });
-        this.activeCell = this.arr2d[0][0];
+
+        if(this.page_index==2) 
+          this.activeCell = this.arr2d[0][0];
         // this.arr_selected = [this.activeCell];
         this.render();
       });
@@ -351,6 +348,9 @@ class Excel {
 
     this.canvas.style.cursor = "cell";
     this.container.style.fontSize = "0px";
+    
+    //Adding Events
+
     // this.canvas.addEventListener("click", (e) => this.click(e, this.canvas));
     this.canvas.addEventListener("dblclick", (e) =>
       this.double_click(e, this.canvas)
@@ -381,7 +381,7 @@ class Excel {
       this.xscroll = false;
     });
     this.canvas.addEventListener("wheel", this.scroller.bind(this));
-    // this.canvas.addEventListener("mouseleave",this.mouseleave.bind(this));
+    //this.canvas.addEventListener("mouseleave",this.mouseleave.bind(this));
     window.addEventListener("resize", this.resize_event.bind(this));
     window.addEventListener("keydown", this.keyMove.bind(this));
     infiX_parent.addEventListener("scroll", this.infi1.bind(this));
@@ -637,8 +637,6 @@ class Excel {
       });
       this.uniqueRowArray = Array.from(uniqueRows).sort((a, b) => a - b);
       console.log(this.uniqueRowArray);
-
-
       this.sidebar.removeEventListener("mousemove", mousemove);
       this.arr_select_t=[]
       //this.sidebar.removeEventListener("mousedown", this.mousedown);
@@ -993,9 +991,6 @@ class Excel {
 // };
 
 
-
-
-
 // delete_row = (e) => {
 //   document.querySelector('.progress-container').style.display = "flex";
 //   let arr = this.uniqueRowArray;
@@ -1163,7 +1158,6 @@ class Excel {
       console.log(`Progress: ${percentage}% (Pending: ${pendingCount})`);
   
       if (pendingCount === 0) {
-          console.log('All requests completed. Hiding progress container and reloading.');
           document.querySelector('.progress-container').style.display = "none";
           setTimeout(() => {
             location.reload(); 
@@ -1172,13 +1166,9 @@ class Excel {
       }
   }
   
-  // Bulk Deletion
-  const idsToDelete = this.arr_selected
-      .filter(c => c.id !== -1)
-      .map(c => c.id);
-  
-  let deletePromise = Promise.resolve(); // Initialize with resolved promise
-  
+  //Bulk Deletion
+  const idsToDelete = this.arr_selected.filter(c => c.id !== -1).map(c => c.id);
+  let deletePromise = Promise.resolve();
   if (idsToDelete.length > 0) {
       totalRequests += idsToDelete.length;
       pendingCount += idsToDelete.length;
@@ -1192,6 +1182,7 @@ class Excel {
               if (c.id !== -1) {
                   c.data = "";
               }
+          
           });
           pendingCount -= idsToDelete.length;
           console.log(`Deleted cells: ${idsToDelete.length}`);
@@ -1215,7 +1206,6 @@ class Excel {
   }
   
   let updatePromise = Promise.resolve(); 
-  
   if (cellsToUpdate.length > 0) {
       totalRequests += cellsToUpdate.length;
       pendingCount += cellsToUpdate.length;
@@ -1262,9 +1252,8 @@ class Excel {
       console.error('Error in bulk operations:', error);
       updateProgressBar();
   });
-  
-
-  };
+ 
+}
 
   /**
    * Cuts  a cell or set of cells
@@ -1281,7 +1270,7 @@ class Excel {
       .map((r) => r.map((c) => c.data).join(","))
       .join("\n");
     navigator.clipboard.writeText(clipboard);
-  };
+}
 
   /**
    * Copys a cell or set of cells
@@ -1304,25 +1293,38 @@ class Excel {
    * @param {MouseEvent|KeyboardEvent} e
    */
   paste_cell = (e) => {
+    let arr=[];
     if (this.first) return;
     this.rightclick.style.display = "none";
-
     if (this.arr_selected_2d.length > 1) {
       for (let i = 0; i < this.arr_selected_2d.length; i++) {
         for (let j = 0; j < this.arr_selected_2d[0].length; j++) {
-          this.arr2d[this.activeCell.rows + i][this.activeCell.cols + j].data =
-            this.arr_selected_2d[i][j].data;
-
+          this.arr2d[this.activeCell.rows + i][this.activeCell.cols + j].data =this.arr_selected_2d[i][j].data;
           if (this.op_cut) {
+            arr.push(this.arr_selected_2d[i][j])
+            console.log(arr)
             this.arr_selected_2d[i][j].data = "";
             this.first = true;
+            console.log("This is arr"+arr)
           }
         }
       }
+      arr.forEach((c) => {
+        c.data = "";
+        if(c.id!==-1){
+        fetch(`http://localhost:5183/api/Cells/${c.id}`, {
+          method: "DELETE",
+        }).then(response => {
+          response.json().then(o => {
+            c.data = "";
+          });
+        });
+      }
+    });
       this.op_cut = false;
-    } else {
-      this.arr2d[this.activeCell.rows][this.activeCell.cols].data =
-        this.arr_selected_2d[0][0].data;
+    }
+    else{
+      this.arr2d[this.activeCell.rows][this.activeCell.cols].data =this.arr_selected_2d[0][0].data;
       if (this.op_cut) {
         this.arr_selected_2d[0][0].data = "";
         this.op_cut = false;
@@ -1616,13 +1618,13 @@ class Excel {
    * @returns
    */
   mousedown(e, canvas) {
-    console.log(this.arr_selected)
     this.keyFirst = false;
     this.doubleClickDetected = false;
     this.col_selection = false;
     this.row_selection = false;
     this.nograbchange = true;
     this.selection_mode = true;
+
     var mousemove = (e) => {
       if (this.grab_detected) {
         if (this.crosshair_detected) return;
@@ -1735,7 +1737,8 @@ class Excel {
         canvas.removeEventListener("mousedown", this.mousedown);
         canvas.removeEventListener("mouseup", mouseup);
         this.render();
-      } else {
+      } 
+      else {
         this.nograbchange = false;
         this.canvas.style.cursor = "cell";
         this.cell = this.activeCell;
@@ -1756,7 +1759,8 @@ class Excel {
       canvas.addEventListener("mousemove", mousemove);
       canvas.addEventListener("mouseup", mouseup);
       return;
-    } else {
+    } 
+    else {
       this.cut = false;
       this.rightclick.style.display = "none";
       this.textbox.style.display = "none";
@@ -1768,6 +1772,7 @@ class Excel {
       this.activeCol = this.header1dside[y1];
       this.activeCell = this.arr2d[y1][x1 - 1];
       this.arr_selected = [this.activeCell];
+      console.log(this.arr_selected)
       this.cell_initial = this.arr2d[y1][x1 - 1];
     }
     canvas.addEventListener("mousemove", mousemove);
@@ -1936,6 +1941,8 @@ class Excel {
       d["italic"] = false;
       d["underline"] = false;
       d["font"] = "Arial";
+      d["rows"] = 0;
+      d["cols"] = 0 ;
       this.arr2d.push([d]);
       this.activeCell = d;
       this.arr_selected = [this.activeCell];
@@ -1975,7 +1982,8 @@ class Excel {
         }
       });
       this.extendHeader(count);
-    } else {
+    } 
+    else {
       this.extendSidebar(count);
       let prevRows = this.arr2d.length;
       for (let i = prevRows; i < prevRows + count; i++) {
@@ -2153,6 +2161,7 @@ class Excel {
     if (Math.abs(finalRow - this.arr2d.length) < 50) {
       this.extendData(100, 2);
       this.pagination();
+      
     }
     if (Math.abs(initialCol - this.arr2d[0].length) < 50) {
       this.extendData(100, 1);

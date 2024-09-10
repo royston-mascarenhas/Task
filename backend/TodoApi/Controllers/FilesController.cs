@@ -108,20 +108,16 @@ namespace TodoApi.Controllers
 
             _context.Files.Add(file);
             _context.SaveChanges();
-
-          
+ 
             long lastInsertedId = _context.Files.Max(x => x.Id);
             dataFile.Id = lastInsertedId;
-
 
             foreach (var chunk in chunks)
             {
                 dataFile.Data = string.Join("\n", chunk);
-                Console.WriteLine("Inserted");
                 _rmq.SendMessage(CreateProducerRequest("POST", JsonConvert.SerializeObject(dataFile)));
                 dataFile.StartRow += chunk.Count + 1;
             }
-
             return Created(nameof(file), JsonConvert.SerializeObject(file));
         }
 
